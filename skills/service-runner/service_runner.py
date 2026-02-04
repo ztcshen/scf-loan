@@ -20,66 +20,81 @@ class ServiceRunner:
         self.web_module_dir = os.path.join(project_dir, "scf-loan-web")
         self.service_url = "http://localhost:8081/api/financing-order/health"
         self.service_process = None
+        self.maven_command = "mvn"
     
     def check_maven(self):
         """检查Maven是否安装"""
         print("检查Maven是否安装...")
-        try:
-            # 执行 mvn -v 命令
-            result = subprocess.run(
-                ["mvn", "-v"],
-                capture_output=True,
-                text=True
-            )
-            
-            if result.returncode == 0:
-                print("Maven已安装！")
-                return True
-            else:
-                print("Maven未安装或无法访问！")
+        
+        # 尝试不同的Maven可执行文件名称
+        maven_commands = ["mvn", "mvn.cmd", "mvn.bat"]
+        
+        for cmd in maven_commands:
+            try:
+                # 执行 Maven 命令
+                result = subprocess.run(
+                    [cmd, "-v"],
+                    capture_output=True,
+                    text=True
+                )
+                
+                if result.returncode == 0:
+                    print("Maven已安装！")
+                    # 保存有效的Maven命令
+                    self.maven_command = cmd
+                    return True
+            except FileNotFoundError:
+                pass
+            except Exception as e:
+                print(f"检查Maven时出现异常：{e}")
                 return False
-        except FileNotFoundError:
-            print("Maven未安装或未添加到系统PATH环境变量中！")
-            return False
-        except Exception as e:
-            print(f"检查Maven时出现异常：{e}")
-            return False
+        
+        print("Maven未安装或未添加到系统PATH环境变量中！")
+        return False
     
     def compile_service(self):
         """编译服务"""
         print("开始编译服务...")
+        print(f"执行命令：{self.maven_command} clean install -DskipTests")
+        print(f"工作目录：{self.project_dir}")
         try:
-            # 执行 mvn clean install 命令
+            # 执行 Maven 编译命令
             result = subprocess.run(
-                ["mvn", "clean", "install", "-DskipTests"],
+                [self.maven_command, "clean", "install", "-DskipTests"],
                 cwd=self.project_dir,
                 capture_output=True,
                 text=True,
                 timeout=300  # 设置5分钟超时
             )
             
+            print(f"命令执行结果：returncode={result.returncode}")
+            print(f"命令输出：")
+            print(result.stdout)
+            print(f"命令错误：")
+            print(result.stderr)
+            
             if result.returncode == 0:
                 print("服务编译成功！")
                 return True
             else:
                 print("服务编译失败！")
-                print("错误输出：")
-                print(result.stderr)
                 return False
         except subprocess.TimeoutExpired:
             print("编译超时，请检查网络和系统资源！")
             return False
         except Exception as e:
             print(f"编译过程中出现异常：{e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def run_service(self):
         """运行服务"""
         print("开始运行服务...")
         try:
-            # 执行 mvn spring-boot:run 命令
+            # 执行 Maven 运行命令
             self.service_process = subprocess.Popen(
-                ["mvn", "spring-boot:run"],
+                [self.maven_command, "spring-boot:run"],
                 cwd=self.web_module_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,

@@ -1,0 +1,192 @@
+# 编排工具 (orchestrator)
+
+## 功能描述
+
+此工具用于编排执行多个开发任务，自动化完成从启动MySQL、生成表数据到执行服务的完整流程。它可以：
+
+1. 启动MySQL服务
+2. 生成数据库表代码
+3. 执行服务编译和运行
+4. 检测服务健康状态
+5. 停止服务
+
+## 安装依赖
+
+此工具依赖于以下Python库：
+
+- `click`：用于命令行参数解析
+
+可以通过以下命令安装依赖：
+
+```bash
+pip install click
+```
+
+## 使用方法
+
+### 基本用法
+
+在项目根目录下执行：
+
+```bash
+python skills/orchestrator/orchestrator.py run
+```
+
+### 查看帮助信息
+
+```bash
+python skills/orchestrator/orchestrator.py --help
+```
+
+### 命令列表
+
+| 命令 | 描述 |
+|------|------|
+| `run` | 执行完整流程：启动MySQL → 生成表数据 → 执行runner |
+| `start-mysql` | 仅启动MySQL服务 |
+| `generate-code` | 仅生成数据库表代码 |
+| `run-service` | 仅执行服务编译和运行 |
+| `cleanup` | 清理资源，停止服务 |
+
+## 执行流程
+
+### 执行完整流程
+
+1. 启动MySQL服务
+2. 生成数据库表代码
+3. 执行服务编译和运行
+4. 检测服务健康状态
+5. 停止服务
+
+### 仅启动MySQL服务
+
+1. 调用mysql-start skill启动MySQL服务
+2. 验证MySQL服务是否正常运行
+
+### 仅生成数据库表代码
+
+1. 调用db-generate skill生成数据库表代码
+
+### 仅执行服务编译和运行
+
+1. 调用service-runner skill执行服务编译和运行
+2. 检测服务健康状态
+
+### 清理资源
+
+1. 停止服务
+
+## 输出示例
+
+### 执行完整流程
+
+```
+开始执行编排流程...
+
+步骤1: 启动MySQL服务
+检查MySQL是否安装...
+MySQL已安装！
+检查MySQL服务状态...
+MySQL服务未启动，正在启动...
+MySQL服务启动成功！
+验证MySQL服务是否正常运行...
+MySQL服务运行正常！
+MySQL连接信息：
+- 主机：localhost
+- 端口：3306
+- 用户名：root
+- 密码：123456
+- 数据库：scf_loan
+
+步骤2: 生成数据库表代码
+开始生成数据库表代码...
+成功连接到数据库：scf_loan
+生成实体类：FinancingOrderEntity
+生成Mapper：FinancingOrderMapper
+生成Service：FinancingOrderService
+生成Service实现：FinancingOrderServiceImpl
+生成DTO：FinancingOrderDTO
+生成Controller：FinancingOrderController
+生成单元测试：FinancingOrderServiceTest
+代码生成完成！
+
+步骤3: 执行服务编译和运行
+开始编译服务...
+服务编译成功！
+开始运行服务...
+正在启动服务，请稍候...
+检查服务健康状态...
+服务健康检查通过！
+
+服务编译运行成功！
+服务健康检查地址：http://localhost:8081/api/financing-order/health
+停止服务...
+服务已停止！
+
+编排流程执行完成！
+```
+
+## 注意事项
+
+1. **依赖要求**：此工具依赖于以下skill：
+   - mysql-start：用于启动MySQL服务
+   - db-generate：用于生成数据库表代码
+   - service-runner：用于执行服务编译和运行
+
+2. **权限要求**：启动MySQL服务可能需要管理员权限
+
+3. **配置要求**：默认使用的MySQL配置为：
+   - 主机：localhost
+   - 端口：3306
+   - 用户名：root
+   - 密码：123456
+   - 数据库：scf_loan
+
+4. **安全注意事项**：此工具仅用于开发和测试环境，不建议在生产环境中使用
+
+## 故障排除
+
+### MySQL启动失败
+
+如果MySQL启动失败，可能是因为：
+
+1. MySQL未正确安装
+2. 缺少管理员权限
+3. MySQL配置错误
+
+请检查MySQL安装和配置，确保正确安装并具有足够的权限。
+
+### 代码生成失败
+
+如果代码生成失败，可能是因为：
+
+1. MySQL服务未启动
+2. 数据库连接配置错误
+3. 表结构不存在
+
+请检查MySQL服务状态和连接配置，确保服务已启动且配置正确。
+
+### 服务编译运行失败
+
+如果服务编译运行失败，可能是因为：
+
+1. 代码编译错误
+2. 服务配置错误
+3. 端口被占用
+
+请检查代码编译错误信息和服务配置，确保代码正确且配置合理。
+
+## 支持的平台
+
+- Windows
+- macOS
+- Linux
+
+## 版本历史
+
+### 1.0.0 (2026-02-04)
+
+- 初始版本
+- 支持执行完整流程：启动MySQL → 生成表数据 → 执行runner
+- 支持单独执行各个步骤
+- 支持清理资源

@@ -112,6 +112,10 @@ metadata:
     - "仅支持 MySQL 数据库"
     - "仅支持 MyBatis Plus 框架"
     - "复杂的表关系可能需要手动调整"
+    - "使用 --ddl 参数时，DDL 文件必须按行定义列，每列定义占一行"
+    - "DDL 文件中的注释必须使用单引号或双引号包围"
+    - "DDL 文件中的索引定义必须单独占一行"
+    - "DDL 文件中的表级配置（如 ENGINE、DEFAULT CHARSET 等）必须单独占一行"
   troubleshooting:
     - problem: "数据库连接失败"
       solution: "检查数据库连接参数和网络连接"

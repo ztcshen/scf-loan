@@ -31,11 +31,21 @@ class DatabaseRemover:
     
     def get_class_names(self, table_name):
         """根据表名生成对应的类名"""
+        # 处理表名，去除前缀，只使用核心部分
+        parts = table_name.split("_")
+        # 找到第一个不是前缀的部分（通常是业务名称）
+        core_parts = []
+        for part in parts:
+            if part not in ["t", "scf"]:
+                core_parts.append(part)
+        # 如果没有找到核心部分，使用整个表名
+        if not core_parts:
+            core_parts = parts
+        # 生成核心名称
+        core_name = ''.join(x.title() for x in core_parts)
+        
         # 生成实体类名
-        entity_name = self.pascal_case(table_name)
-        if entity_name.endswith("Entity"):
-            entity_name = entity_name[:-6]
-        entity_name += "Entity"
+        entity_name = core_name + "Entity"
         
         # 生成其他类名
         mapper_name = entity_name.replace("Entity", "Mapper")
@@ -244,16 +254,14 @@ class DatabaseRemover:
 
 
 @click.command()
-def main():
+@click.option('--base-dir', default='.', help='Project Base Directory')
+@click.option('--tables', default='t_scf_financing_order', help='Table Name(s) (comma-separated)')
+@click.option('--force', is_flag=True, default=False, help='Force Removal')
+@click.option('--dry-run', is_flag=True, default=False, help='Dry Run (Preview Only)')
+def main(base_dir, tables, force, dry_run):
     """数据库表代码清理工具"""
-    # 获取命令行参数
-    base_dir = click.prompt("Project Base Directory", default=".")
-    tables_input = click.prompt("Table Name(s) (comma-separated)", default="t_scf_financing_order")
-    force = click.confirm("Force Removal", default=False)
-    dry_run = click.confirm("Dry Run (Preview Only)", default=False)
-    
     # 解析表名列表
-    tables = [table.strip() for table in tables_input.split(",")]
+    tables = [table.strip() for table in tables.split(",")]
     
     # 创建清理工具
     remover = DatabaseRemover(
