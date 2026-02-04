@@ -1,0 +1,32 @@
+package {{ package }};
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import {{ service_package }}.{{ service_name }};
+import {{ entity_package }}.{{ entity_name }};
+import {{ mapper_package }}.{{ mapper_name }};
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * {{ entity_name }} 服务实现类
+ */
+@Service
+public class {{ service_impl_name }} extends ServiceImpl<{{ mapper_name }}, {{ entity_name }}> implements {{ service_name }} {
+
+    @Override
+    public boolean batchCreate{{ entity_name|replace('Entity', '') }}(List<{{ entity_name }}> entities) {
+        return saveBatch(entities);
+    }
+
+    @Override
+    public boolean batchUpdate{{ entity_name|replace('Entity', '') }}(List<{{ entity_name }}> entities) {
+        return updateBatchById(entities);
+    }
+
+    @Override
+    public List<{{ entity_name }}> page{{ entity_name|replace('Entity', '') }}(Integer page, Integer size) {
+        return page(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page, size)).getRecords();
+    }
+}
+

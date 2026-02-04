@@ -1,0 +1,34 @@
+package {{ package }};
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import {{ entity_package }}.{{ entity_name }};
+
+import java.util.List;
+
+/**
+ * {{ entity_name }} 服务接口
+ */
+public interface {{ service_name }} extends IService<{{ entity_name }}> {
+
+    /**
+     * 批量创建{{ entity_name|replace('Entity', '') }}
+     * @param entities {{ entity_name }}实体列表
+     * @return 是否创建成功
+     */
+    boolean batchCreate{{ entity_name|replace('Entity', '') }}(List<{{ entity_name }}> entities);
+
+    /**
+     * 批量更新{{ entity_name|replace('Entity', '') }}
+     * @param entities {{ entity_name }}实体列表
+     * @return 是否更新成功
+     */
+    boolean batchUpdate{{ entity_name|replace('Entity', '') }}(List<{{ entity_name }}> entities);
+
+    /**
+     * 分页查询{{ entity_name|replace('Entity', '') }}
+     * @param page 页码
+     * @param size 每页大小
+     * @return {{ entity_name }}列表
+     */
+    List<{{ entity_name }}> page{{ entity_name|replace('Entity', '') }}(Integer page, Integer size);
+}

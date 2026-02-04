@@ -1,0 +1,35 @@
+package {{ package }};
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+{% if 'LocalDateTime' in fields|map(attribute='java_type') %}
+import java.time.LocalDateTime;
+{% endif %}
+{% if 'LocalDate' in fields|map(attribute='java_type') %}
+import java.time.LocalDate;
+{% endif %}
+{% if 'BigDecimal' in fields|map(attribute='java_type') %}
+import java.math.BigDecimal;
+{% endif %}
+
+/**
+ * {{ table_comment }}
+ */
+@Data
+@TableName("{{ table_name }}")
+public class {{ entity_name }} {
+
+{% for field in fields %}
+    /**
+     * {{ field.comment }}
+     */
+    {% if field.is_id %}
+    @TableId(type = IdType.AUTO)
+    {% endif %}
+    private {{ field.java_type }} {{ field.field_name }};
+
+{% endfor %}
+}

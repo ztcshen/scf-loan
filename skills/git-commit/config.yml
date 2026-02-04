@@ -1,0 +1,59 @@
+# Git 提交代码技能配置文件
+
+# Git 相关配置
+git:
+  # Git 命令超时时间（秒）
+  timeout: 60
+  # 是否自动添加所有改动文件
+  auto_add: true
+  # 提交时是否包含未跟踪的文件
+  include_untracked: true
+
+# Maven 相关配置
+maven:
+  # Maven 命令
+  command: mvn
+  # Maven 命令超时时间（秒）
+  timeout: 300
+  # Maven 额外参数
+  extra_args: ""
+
+# 测试相关配置
+tests:
+  # 是否执行测试
+  enabled: true
+  # 测试命令
+  command: mvn test
+  # 测试超时时间（秒）
+  timeout: 600
+  # 测试失败是否中断提交
+  fail_on_error: true
+
+# 编译相关配置
+build:
+  # 是否执行编译
+  enabled: true
+  # 编译命令
+  command: mvn compile
+  # 编译超时时间（秒）
+  timeout: 300
+  # 编译失败是否中断提交
+  fail_on_error: true
+
+# 提交相关配置
+commit:
+  # 提交信息模板
+  message_template: "{message}\n\n{summary}"
+  # 是否在提交信息中包含改动点总结
+  include_summary: true
+  # 改动点总结的最大文件数
+  max_summary_files: 10
+
+# 日志相关配置
+logging:
+  # 日志级别（debug, info, warn, error）
+  level: info
+  # 是否输出详细日志
+  verbose: false
+  # 日志文件路径（可选）
+  file: ""

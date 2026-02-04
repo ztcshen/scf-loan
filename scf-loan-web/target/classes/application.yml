@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: scf-loan-web
+  datasource:
+    url: jdbc:mysql://localhost:3306/scf_loan?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    database: 0
+  main:
+    allow-bean-definition-overriding: true
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.scf.loan.dal.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# Dubbo 配置
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: zookeeper://localhost:2181
+  protocol:
+    name: dubbo
+    port: 20880
+
+# Apollo 配置
+app:
+  id: scf-loan
+apollo:
+  meta: http://localhost:8080
+  bootstrap:
+    enabled: true
+    namespaces: application
+
+server:
+  port: 8080

@@ -1,0 +1,63 @@
+package {{ package }};
+
+import {{ service_package }}.{{ service_name }};
+import {{ dto_package }}.{{ dto_name }};
+import {{ entity_package }}.{{ entity_name }};
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * {{ entity_name|replace('Entity', '') }}控制器
+ */
+@RestController
+@RequestMapping("{{ api_path }}")
+public class {{ controller_name }} {
+
+    @Autowired
+    private {{ service_name }} {{ service_name|lower|replace('service', '') }}Service;
+
+    /**
+     * 批量创建{{ entity_name|replace('Entity', '') }}
+     */
+    @PostMapping("/batch")
+    public boolean batchCreate{{ entity_name|replace('Entity', '') }}(@RequestBody List<{{ dto_name }}> dtos) {
+        List<{{ entity_name }}> entities = dtos.stream().map(dto -> {
+            {{ entity_name }} entity = new {{ entity_name }}();
+            BeanUtils.copyProperties(dto, entity);
+            return entity;
+        }).collect(Collectors.toList());
+        return {{ service_name|lower|replace('service', '') }}Service.batchCreate{{ entity_name|replace('Entity', '') }}(entities);
+    }
+
+    /**
+     * 批量更新{{ entity_name|replace('Entity', '') }}
+     */
+    @PutMapping("/batch")
+    public boolean batchUpdate{{ entity_name|replace('Entity', '') }}(@RequestBody List<{{ dto_name }}> dtos) {
+        List<{{ entity_name }}> entities = dtos.stream().map(dto -> {
+            {{ entity_name }} entity = new {{ entity_name }}();
+            BeanUtils.copyProperties(dto, entity);
+            return entity;
+        }).collect(Collectors.toList());
+        return {{ service_name|lower|replace('service', '') }}Service.batchUpdate{{ entity_name|replace('Entity', '') }}(entities);
+    }
+
+    /**
+     * 分页查询{{ entity_name|replace('Entity', '') }}
+     */
+    @GetMapping("/page")
+    public List<{{ dto_name }}> page{{ entity_name|replace('Entity', '') }}(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        List<{{ entity_name }}> entities = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(page, size);
+        return entities.stream().map(entity -> {
+            {{ dto_name }} dto = new {{ dto_name }}();
+            BeanUtils.copyProperties(entity, dto);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+}
