@@ -15,6 +15,61 @@ import java.util.List;
 public class {{ service_impl_name }} extends ServiceImpl<{{ mapper_name }}, {{ entity_name }}> implements {{ service_name }} {
 
     @Override
+    public boolean createOrder({{ entity_name }} entity) {
+        return save(entity);
+    }
+
+    @Override
+    public {{ entity_name }} getByFinancingOrderId(String financingOrderId) {
+        return null;
+    }
+
+    @Override
+    public {{ entity_name }} getByMerTransNo(String merTransNo) {
+        return null;
+    }
+
+    @Override
+    public List<{{ entity_name }}> listValidOrders() {
+        return list();
+    }
+
+    @Override
+    public List<{{ entity_name }}> listByStatus(String applyStatus, String loanConfirmStatus, String repayStatus) {
+        return list();
+    }
+
+    @Override
+    public boolean updateApplyStatus(Long id, String applyStatus) {
+        {{ entity_name }} entity = getById(id);
+        if (entity != null) {
+            entity.setApplyStatus(applyStatus);
+            return updateById(entity);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateLoanConfirmStatus(Long id, String loanConfirmStatus) {
+        {{ entity_name }} entity = getById(id);
+        if (entity != null) {
+            entity.setLoanConfirmStatus(loanConfirmStatus);
+            return updateById(entity);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateRepayStatus(Long id, String repayStatus) {
+        {{ entity_name }} entity = getById(id);
+        if (entity != null) {
+            entity.setRepayStatus(repayStatus);
+            return updateById(entity);
+        }
+        return false;
+    }
+
+    @Override
     public boolean batchCreate{{ entity_name|replace('Entity', '') }}(List<{{ entity_name }}> entities) {
         return saveBatch(entities);
     }

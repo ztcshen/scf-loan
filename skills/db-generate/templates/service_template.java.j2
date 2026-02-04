@@ -11,6 +11,66 @@ import java.util.List;
 public interface {{ service_name }} extends IService<{{ entity_name }}> {
 
     /**
+     * 创建{{ entity_name|replace('Entity', '') }}
+     * @param entity {{ entity_name }}实体
+     * @return 是否创建成功
+     */
+    boolean createOrder({{ entity_name }} entity);
+
+    /**
+     * 根据融资订单号查询订单
+     * @param financingOrderId 融资订单号
+     * @return {{ entity_name }}实体
+     */
+    {{ entity_name }} getByFinancingOrderId(String financingOrderId);
+
+    /**
+     * 根据商户订单号查询订单
+     * @param merTransNo 商户订单号
+     * @return {{ entity_name }}实体
+     */
+    {{ entity_name }} getByMerTransNo(String merTransNo);
+
+    /**
+     * 查询所有有效订单
+     * @return {{ entity_name }}列表
+     */
+    List<{{ entity_name }}> listValidOrders();
+
+    /**
+     * 根据状态查询订单
+     * @param applyStatus 审批状态
+     * @param loanConfirmStatus 放款状态
+     * @param repayStatus 还款状态
+     * @return {{ entity_name }}列表
+     */
+    List<{{ entity_name }}> listByStatus(String applyStatus, String loanConfirmStatus, String repayStatus);
+
+    /**
+     * 更新审批状态
+     * @param id 订单ID
+     * @param applyStatus 审批状态
+     * @return 是否更新成功
+     */
+    boolean updateApplyStatus(Long id, String applyStatus);
+
+    /**
+     * 更新放款状态
+     * @param id 订单ID
+     * @param loanConfirmStatus 放款状态
+     * @return 是否更新成功
+     */
+    boolean updateLoanConfirmStatus(Long id, String loanConfirmStatus);
+
+    /**
+     * 更新还款状态
+     * @param id 订单ID
+     * @param repayStatus 还款状态
+     * @return 是否更新成功
+     */
+    boolean updateRepayStatus(Long id, String repayStatus);
+
+    /**
      * 批量创建{{ entity_name|replace('Entity', '') }}
      * @param entities {{ entity_name }}实体列表
      * @return 是否创建成功
