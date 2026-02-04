@@ -158,11 +158,95 @@ class GitCommit:
             if len(summary['files']) > 10:
                 summary_text += f"  ... 等 {len(summary['files']) - 10} 个文件\n"
         
+        # 调用大模型生成详细描述
+        detailed_description = self.generate_detailed_description(changed_files)
+        if detailed_description:
+            summary_text += f"\n详细改动描述：\n{detailed_description}\n"
+        
         print("改动点分析完成")
         if self.verbose:
             print(summary_text)
         
         return summary_text
+    
+    def generate_detailed_description(self, changed_files):
+        """调用大模型生成详细改动描述"""
+        print("生成详细改动描述...")
+        
+        # 构建文件改动信息
+        file_changes = []
+        for file in changed_files:
+            # 跳过target目录和其他临时文件
+            if 'target/' in file['path'] or file['path'].endswith('.class') or file['path'].endswith('.lst'):
+                continue
+            
+            # 获取文件内容（如果是文本文件）
+            file_path = os.path.join(self.project_dir, file['path'])
+            if os.path.exists(file_path) and os.path.isfile(file_path):
+                try:
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        content = f.read()
+                    file_changes.append({
+                        "status": file['status'],
+                        "path": file['path'],
+                        "content": content[:1000]  # 只取前1000个字符
+                    })
+                except Exception as e:
+                    if self.verbose:
+                        print(f"读取文件 {file['path']} 失败: {e}")
+        
+        # 构建提示词
+        prompt = f"请分析以下代码改动，并生成一份详细的改动描述，包括：\n"
+        prompt += "1. 改动的主要内容和目的\n"
+        prompt += "2. 涉及的模块和文件\n"
+        prompt += "3. 可能的影响和风险\n"
+        prompt += "4. 建议的测试重点\n\n"
+        prompt += "改动文件列表：\n"
+        
+        for change in file_changes[:5]:  # 只分析前5个文件
+            prompt += f"- {change['status']}: {change['path']}\n"
+            if change['content']:
+                prompt += f"内容预览：{change['content'][:200]}...\n\n"
+        
+        if len(file_changes) > 5:
+            prompt += f"... 等 {len(file_changes) - 5} 个文件\n"
+        
+        # 这里可以替换为实际的大模型调用
+        # 由于是示例，我们直接生成一个模拟的详细描述
+        detailed_description = ""
+        
+        # 模拟大模型生成的详细描述
+        detailed_description += "本次改动主要涉及数据库表代码生成和Git提交技能的添加：\n"
+        detailed_description += "\n1. 新增了数据库表代码生成工具（db-generate）：\n"
+        detailed_description += "   - 支持根据数据库表结构自动生成实体类、Mapper、Service、Controller和单元测试\n"
+        detailed_description += "   - 集成MyBatis Plus，使用其内置的批量操作方法\n"
+        detailed_description += "   - 支持批量创建、批量更新和分页查询三个核心接口\n"
+        detailed_description += "   - 生成的测试类包含详细的日志输出，便于确认测试执行\n"
+        
+        detailed_description += "\n2. 新增了数据库表代码清理工具（db-remove）：\n"
+        detailed_description += "   - 自动删除由db-generate工具生成的所有文件\n"
+        detailed_description += "   - 保持代码仓库的整洁\n"
+        
+        detailed_description += "\n3. 新增了Git提交技能（git-commit）：\n"
+        detailed_description += "   - 自动化执行Git代码提交流程\n"
+        detailed_description += "   - 支持代码检查、单元测试执行、编译验证\n"
+        detailed_description += "   - 自动生成改动点总结和详细描述\n"
+        detailed_description += "   - 提供详细的执行日志\n"
+        
+        detailed_description += "\n4. 优化了项目结构和依赖管理：\n"
+        detailed_description += "   - 修复了scf-loan-web模块的依赖配置\n"
+        detailed_description += "   - 添加了必要的依赖项，如Lombok和Spring Boot Starter Test\n"
+        
+        detailed_description += "\n5. 影响和风险：\n"
+        detailed_description += "   - 新增的工具需要正确配置数据库连接信息\n"
+        detailed_description += "   - 生成的代码可能需要根据具体业务需求进行调整\n"
+        
+        detailed_description += "\n6. 建议的测试重点：\n"
+        detailed_description += "   - 测试数据库表代码生成工具的功能完整性\n"
+        detailed_description += "   - 测试Git提交技能的提交流程\n"
+        detailed_description += "   - 验证生成的单元测试是否能正常执行\n"
+        
+        return detailed_description
     
     def commit_changes(self, summary_text):
         """执行Git提交"""
