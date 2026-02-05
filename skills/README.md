@@ -6,7 +6,7 @@
 
 ```
 skills/
-├── db-generate/         # 数据库表代码生成工具
+├── db-generate/         # 数据库表代码生成工具（不生成Controller）
 ├── db-remove/           # 数据库表代码清理工具
 ├── git-commit/          # Git 提交工具
 ├── service-runner/      # 服务编译运行工具
@@ -17,7 +17,7 @@ skills/
 
 ### 1. db-generate（数据库表代码生成工具）
 
-**功能**：根据数据库表结构生成对应的 Java 代码，包括实体类、Mapper 接口、DTO 类、Service 接口、Service 实现类、Controller 类和单元测试类。
+**功能**：根据数据库表结构生成对应的 Java 代码，包括实体类、Mapper 接口、DTO 类、Service 接口、Service 实现类和单元测试类（当前版本不生成 Controller）。
 
 **使用方法**：
 
@@ -63,12 +63,12 @@ python skills/git-commit/git_commit.py --message <commit_message>
 
 ### 4. service-runner（服务编译运行工具）
 
-**功能**：编译和运行 scf-loan-web 服务，并检测服务是否能正常启动运行。
+**功能**：编译和运行 scf-loan-web 服务，并可选检测服务是否能正常启动运行（默认跳过健康检查）。
 
 **使用方法**：
 
 ```bash
-python skills/service-runner/service_runner.py [--project-dir <project_dir>]
+python skills/service-runner/service_runner.py [--project-dir <project_dir>] [--skip-health]
 ```
 
 **参数说明**：
@@ -83,7 +83,7 @@ python skills/service-runner/service_runner.py [--project-dir <project_dir>]
 
 ## 注意事项
 
-1. **数据库连接**：db-generate 和 db-remove 工具需要连接到数据库，请确保数据库服务已启动，并且在 `db-generate/config.yml` 文件中配置了正确的数据库连接信息。
+1. **数据库连接**：db-generate 支持数据库连接；连接失败时自动降级为默认DDL解析，无需手动干预。
 
 2. **Maven 环境**：service-runner 工具需要 Maven 环境，请确保 Maven 已安装并添加到系统 PATH 环境变量中。
 

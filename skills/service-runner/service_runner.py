@@ -14,7 +14,7 @@ import urllib.error
 
 
 class ServiceRunner:
-    def __init__(self, project_dir, service_url=None, wait_seconds=10, skip_build=False):
+    def __init__(self, project_dir, service_url=None, wait_seconds=10, skip_build=False, skip_health=False):
         """初始化服务运行器"""
         self.project_dir = project_dir
         self.web_module_dir = os.path.join(project_dir, "scf-loan-web")
@@ -23,6 +23,7 @@ class ServiceRunner:
         self.maven_command = "mvn"
         self.wait_seconds = wait_seconds
         self.skip_build = skip_build
+        self.skip_health = skip_health
     
     def check_maven(self):
         """检查Maven是否安装"""
@@ -117,6 +118,9 @@ class ServiceRunner:
     
     def check_service_health(self):
         """检查服务健康状态"""
+        if self.skip_health:
+            print("跳过健康检查（skip_health=true）")
+            return True
         print("检查服务健康状态...")
         try:
             # 发送健康检查请求
@@ -196,14 +200,15 @@ class ServiceRunner:
 @click.option('--service-url', default=None, help='健康检查URL')
 @click.option('--wait-seconds', default=10, type=int, help='服务启动等待秒数')
 @click.option('--skip-build', is_flag=True, default=False, help='跳过编译步骤')
-def main(project_dir, service_url, wait_seconds, skip_build):
+@click.option('--skip-health', is_flag=True, default=True, help='跳过健康检查')
+def main(project_dir, service_url, wait_seconds, skip_build, skip_health):
     """服务编译运行工具"""
     # 转换为绝对路径
     project_dir = os.path.abspath(project_dir)
     print(f"项目根目录：{project_dir}")
     
     # 创建服务运行器
-    runner = ServiceRunner(project_dir, service_url=service_url, wait_seconds=wait_seconds, skip_build=skip_build)
+    runner = ServiceRunner(project_dir, service_url=service_url, wait_seconds=wait_seconds, skip_build=skip_build, skip_health=skip_health or os.environ.get("SCF_SKIP_HEALTH","true").lower()=="true")
     
     # 运行完整流程
     success = runner.run_full_process()

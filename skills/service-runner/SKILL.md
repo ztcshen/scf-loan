@@ -2,11 +2,11 @@
 
 ## 功能描述
 
-此工具用于编译和运行scf-loan-web服务，并检测服务是否能正常启动运行。它会执行以下操作：
+此工具用于编译和运行scf-loan-web服务，并可选检测服务是否能正常启动运行。它会执行以下操作：
 
 1. 编译整个项目（执行 `mvn clean install`）
 2. 运行scf-loan-web服务（执行 `mvn spring-boot:run`）
-3. 检测服务是否能正常启动（访问健康检查接口）
+3. （可选）检测服务是否能正常启动（访问健康检查接口）
 4. 停止服务
 
 ## 安装依赖
@@ -29,7 +29,7 @@ pip install click requests
 在项目根目录下执行：
 
 ```bash
-python skills/service-runner/service_runner.py
+python skills/service-runner/service_runner.py --skip-health
 ```
 
 ### 指定项目目录
@@ -45,7 +45,7 @@ python skills/service-runner/service_runner.py --project-dir /path/to/scf-loan
 1. **编译服务**：执行 `mvn clean install -DskipTests` 命令，编译整个项目
 2. **运行服务**：执行 `mvn spring-boot:run` 命令，运行scf-loan-web服务
 3. **等待服务启动**：等待10秒，让服务有足够的时间启动
-4. **检查服务健康状态**：访问 `http://localhost:8081/api/financing-order/health` 接口，检测服务是否能正常响应
+4. **（可选）检查健康状态**：访问 `SCF_SERVICE_URL` 或 `--service-url` 指定的接口；默认 `--skip-health` 启用，跳过检查
 5. **停止服务**：无论成功与否，都会停止服务进程
 
 ## 输出示例
@@ -100,7 +100,7 @@ python skills/service-runner/service_runner.py --project-dir /path/to/scf-loan
 2. **网络要求**：编译过程中需要下载依赖，确保网络连接正常
 3. **端口要求**：服务默认使用8081端口，确保此端口未被占用
 4. **超时设置**：编译过程设置了5分钟超时，运行过程设置了10秒超时
-5. **健康检查**：服务需要有 `/api/financing-order/health` 接口，返回 "OK" 字符串
+5. **健康检查**：若启用，需配置健康检查端点并返回 "OK"；默认跳过
 
 ## 故障排除
 

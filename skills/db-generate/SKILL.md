@@ -1,6 +1,6 @@
 ---
 name: db-generate
-description: 数据库表代码生成工具，根据数据库表结构自动生成实体类、Mapper、Service、Controller 等基础代码，并提供代码验证和单元测试生成功能
+description: 数据库表代码生成工具，根据数据库表结构自动生成实体类、Mapper、Service、DTO、ServiceImpl 等基础代码，并提供代码验证和单元测试生成功能（当前版本不生成 Controller，外部暴露由其他技能负责）
 metadata:
   emoji: "🗄️"
   requires:
@@ -131,7 +131,7 @@ metadata:
       changes:
         - "初始版本，支持基本的代码生成功能"
         - "支持 MySQL 数据库表结构解析"
-        - "生成实体类、Mapper、Service、Controller 代码"
+        - "生成实体类、Mapper、Service、DTO、ServiceImpl 代码"
         - "添加代码验证功能"
         - "添加单元测试生成功能"
   generated-files:
@@ -145,3 +145,16 @@ metadata:
         description: 覆盖注释中的技能版本号，默认 "1.0.0"
     rationale: |
       通过强制文件头标识，确保后续维护者清楚代码来源与再生产路径，减少手改导致的偏差；如确需手改，要求在注释进行充分记录与版本标注。
+    files:
+      - module: scf-loan-dal
+        paths:
+          - src/main/java/com/scf/loan/dal/entity/<Entity>.java
+          - src/main/java/com/scf/loan/dal/mapper/<Mapper>.java
+      - module: scf-loan-biz
+        paths:
+          - src/main/java/com/scf/loan/biz/service/<Service>.java
+          - src/main/java/com/scf/loan/biz/service/impl/<ServiceImpl>.java
+      - module: scf-loan-common
+        paths:
+          - src/main/java/com/scf/loan/common/dto/<DTO>.java
+          - src/main/java/com/scf/loan/common/dto/<PageDTO>.java

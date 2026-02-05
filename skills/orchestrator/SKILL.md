@@ -2,13 +2,12 @@
 
 ## 功能描述
 
-此工具用于编排执行多个开发任务，自动化完成从启动MySQL、生成表数据到执行服务的完整流程。它可以：
+此工具用于编排执行多个开发任务，自动化完成从生成表代码到执行服务的完整流程。它可以：
 
-1. 启动MySQL服务
-2. 生成数据库表代码
-3. 执行服务编译和运行
-4. 检测服务健康状态
-5. 停止服务
+1. 生成数据库表代码（支持数据库连接或默认DDL降级）
+2. 执行服务编译和运行
+3. 可选检测服务健康状态
+4. 清理与停止服务
 
 ## 安装依赖
 
@@ -42,8 +41,7 @@ python skills/orchestrator/orchestrator.py --help
 
 | 命令 | 描述 |
 |------|------|
-| `run` | 执行完整流程：启动MySQL → 生成表数据 → 执行runner |
-| `start-mysql` | 仅启动MySQL服务 |
+| `run` | 执行完整流程：生成表代码 → 执行runner |
 | `generate-code` | 仅生成数据库表代码 |
 | `run-service` | 仅执行服务编译和运行 |
 | `cleanup` | 清理资源，停止服务 |
@@ -52,16 +50,10 @@ python skills/orchestrator/orchestrator.py --help
 
 ### 执行完整流程
 
-1. 启动MySQL服务
-2. 生成数据库表代码
-3. 执行服务编译和运行
-4. 检测服务健康状态
-5. 停止服务
-
-### 仅启动MySQL服务
-
-1. 调用mysql-start skill启动MySQL服务
-2. 验证MySQL服务是否正常运行
+1. 生成数据库表代码
+2. 执行服务编译和运行
+3. （可选）检测服务健康状态
+4. 停止服务
 
 ### 仅生成数据库表代码
 
@@ -83,43 +75,26 @@ python skills/orchestrator/orchestrator.py --help
 ```
 开始执行编排流程...
 
-步骤1: 启动MySQL服务
-检查MySQL是否安装...
-MySQL已安装！
-检查MySQL服务状态...
-MySQL服务未启动，正在启动...
-MySQL服务启动成功！
-验证MySQL服务是否正常运行...
-MySQL服务运行正常！
-MySQL连接信息：
-- 主机：localhost
-- 端口：3306
-- 用户名：root
-- 密码：123456
-- 数据库：scf_loan
-
-步骤2: 生成数据库表代码
+步骤1: 生成数据库表代码
 开始生成数据库表代码...
-成功连接到数据库：scf_loan
+尝试连接数据库失败，切换为默认DDL解析
 生成实体类：FinancingOrderEntity
 生成Mapper：FinancingOrderMapper
 生成Service：FinancingOrderService
 生成Service实现：FinancingOrderServiceImpl
 生成DTO：FinancingOrderDTO
-生成Controller：FinancingOrderController
 生成单元测试：FinancingOrderServiceTest
 代码生成完成！
 
-步骤3: 执行服务编译和运行
+步骤2: 执行服务编译和运行
 开始编译服务...
 服务编译成功！
 开始运行服务...
 正在启动服务，请稍候...
-检查服务健康状态...
-服务健康检查通过！
+（可选）检查服务健康状态...
+健康检查未启用或端点未配置，跳过
 
 服务编译运行成功！
-服务健康检查地址：http://localhost:8081/api/financing-order/health
 停止服务...
 服务已停止！
 
@@ -129,32 +104,20 @@ MySQL连接信息：
 ## 注意事项
 
 1. **依赖要求**：此工具依赖于以下skill：
-   - mysql-start：用于启动MySQL服务
-   - db-generate：用于生成数据库表代码
-   - service-runner：用于执行服务编译和运行
+   - db-generate：用于生成数据库表代码（支持默认DDL降级）
+   - service-runner：用于执行服务编译和运行（可配置健康检查）
 
 2. **权限要求**：启动MySQL服务可能需要管理员权限
 
-3. **配置要求**：默认使用的MySQL配置为：
-   - 主机：localhost
-   - 端口：3306
-   - 用户名：root
-   - 密码：123456
-   - 数据库：scf_loan
+3. **配置要求**：如需连接数据库，参考 db-generate 的配置；未连接时将自动使用默认DDL解析生成代码
 
 4. **安全注意事项**：此工具仅用于开发和测试环境，不建议在生产环境中使用
 
 ## 故障排除
 
-### MySQL启动失败
+### 数据库连接失败
 
-如果MySQL启动失败，可能是因为：
-
-1. MySQL未正确安装
-2. 缺少管理员权限
-3. MySQL配置错误
-
-请检查MySQL安装和配置，确保正确安装并具有足够的权限。
+如果数据库连接失败，工具会自动降级为默认DDL解析，无需手动干预。
 
 ### 代码生成失败
 
