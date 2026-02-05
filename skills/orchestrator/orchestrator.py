@@ -40,20 +40,32 @@ class Orchestrator:
             print(f"错误信息：{result.stderr}")
             return False
     
-    def generate_code(self):
+    def generate_code(self, table="t_scf_financing_order", generate_tests=True, validate=False, api_prefix=None):
         """生成数据库表代码"""
         print("\n步骤1: 生成数据库表代码")
         
         # 调用db-generate skill生成数据库表代码
-        command = ["python", "skills/db-generate/db_generate.py", "--table", "t_scf_financing_order", "--generate-tests"]
+        command = ["python", "skills/db-generate/db_generate.py", "--table", table]
+        if generate_tests:
+            command.append("--generate-tests")
+        if validate:
+            command.append("--validate")
+        if api_prefix:
+            command.extend(["--api-prefix", api_prefix])
         return self.run_command(command)
     
-    def run_service(self):
+    def run_service(self, service_url=None, wait_seconds=10, skip_build=False):
         """执行服务编译和运行"""
         print("\n步骤2: 执行服务编译和运行")
         
         # 调用service-runner skill执行服务编译和运行
         command = ["python", "skills/service-runner/service_runner.py"]
+        if service_url:
+            command.extend(["--service-url", service_url])
+        if wait_seconds is not None:
+            command.extend(["--wait-seconds", str(wait_seconds)])
+        if skip_build:
+            command.append("--skip-build")
         return self.run_command(command)
     
     def cleanup(self):
@@ -64,18 +76,18 @@ class Orchestrator:
         print("服务已停止！")
         return True
     
-    def run_full_process(self):
+    def run_full_process(self, table="t_scf_financing_order", generate_tests=True, validate=False, api_prefix=None, service_url=None, wait_seconds=10, skip_build=False):
         """执行完整流程"""
         print("开始执行编排流程...")
         
         try:
             # 1. 生成数据库表代码
-            if not self.generate_code():
+            if not self.generate_code(table=table, generate_tests=generate_tests, validate=validate, api_prefix=api_prefix):
                 print("生成数据库表代码失败，流程终止！")
                 return False
             
             # 2. 执行服务编译和运行
-            if not self.run_service():
+            if not self.run_service(service_url=service_url, wait_seconds=wait_seconds, skip_build=skip_build):
                 print("执行服务编译和运行失败，流程终止！")
                 return False
             
@@ -96,27 +108,49 @@ def cli():
 
 
 @cli.command()
-def run():
+@click.option('--table', default='t_scf_financing_order', help='表名')
+@click.option('--generate-tests', is_flag=True, default=True, help='是否生成单测')
+@click.option('--validate', is_flag=True, default=False, help='生成后进行校验')
+@click.option('--api-prefix', default=None, help='API 前缀，默认 /api')
+@click.option('--service-url', default=None, help='健康检查URL')
+@click.option('--wait-seconds', default=10, type=int, help='服务启动等待秒数')
+@click.option('--skip-build', is_flag=True, default=False, help='跳过编译步骤')
+def run(table, generate_tests, validate, api_prefix, service_url, wait_seconds, skip_build):
     """执行完整流程：生成表数据 → 执行runner"""
     project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     orchestrator = Orchestrator(project_dir)
-    orchestrator.run_full_process()
+    orchestrator.run_full_process(
+        table=table,
+        generate_tests=generate_tests,
+        validate=validate,
+        api_prefix=api_prefix,
+        service_url=service_url,
+        wait_seconds=wait_seconds,
+        skip_build=skip_build
+    )
 
 
 @cli.command()
-def generate_code():
+@click.option('--table', default='t_scf_financing_order', help='表名')
+@click.option('--generate-tests', is_flag=True, default=True, help='是否生成单测')
+@click.option('--validate', is_flag=True, default=False, help='生成后进行校验')
+@click.option('--api-prefix', default=None, help='API 前缀，默认 /api')
+def generate_code(table, generate_tests, validate, api_prefix):
     """仅生成数据库表代码"""
     project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     orchestrator = Orchestrator(project_dir)
-    orchestrator.generate_code()
+    orchestrator.generate_code(table=table, generate_tests=generate_tests, validate=validate, api_prefix=api_prefix)
 
 
 @cli.command()
-def run_service():
+@click.option('--service-url', default=None, help='健康检查URL')
+@click.option('--wait-seconds', default=10, type=int, help='服务启动等待秒数')
+@click.option('--skip-build', is_flag=True, default=False, help='跳过编译步骤')
+def run_service(service_url, wait_seconds, skip_build):
     """仅执行服务编译和运行"""
     project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     orchestrator = Orchestrator(project_dir)
-    orchestrator.run_service()
+    orchestrator.run_service(service_url=service_url, wait_seconds=wait_seconds, skip_build=skip_build)
 
 
 @cli.command()

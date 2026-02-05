@@ -12,6 +12,7 @@ import json
 import yaml
 import click
 import pymysql
+from datetime import datetime
 from jinja2 import Template, FileSystemLoader, Environment
 
 
@@ -34,6 +35,10 @@ class DatabaseGenerator:
             trim_blocks=True,
             lstrip_blocks=True
         )
+        # 生成元信息
+        self.generator_name = "db-generate"
+        self.generator_version = os.environ.get("SCF_SKILL_VERSION", "1.0.0")
+        self.generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     def connect(self):
         """连接数据库"""
@@ -169,7 +174,10 @@ class DatabaseGenerator:
             entity_name=entity_name,
             table_name=table_name,
             table_comment=table_comment,
-            fields=fields
+            fields=fields,
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
         )
         
         # 生成文件路径
@@ -202,7 +210,10 @@ class DatabaseGenerator:
             package=f"{self.base_package}.dal.mapper",
             mapper_name=mapper_name,
             entity_name=entity_name,
-            entity_package=f"{self.base_package}.dal.entity"
+            entity_package=f"{self.base_package}.dal.entity",
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
         )
         
         # 生成文件路径
@@ -235,7 +246,10 @@ class DatabaseGenerator:
             package=f"{self.base_package}.biz.service",
             service_name=service_name,
             entity_name=entity_name,
-            entity_package=f"{self.base_package}.dal.entity"
+            entity_package=f"{self.base_package}.dal.entity",
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
         )
         
         # 生成文件路径
@@ -272,7 +286,10 @@ class DatabaseGenerator:
             mapper_name=mapper_name,
             service_package=f"{self.base_package}.biz.service",
             entity_package=f"{self.base_package}.dal.entity",
-            mapper_package=f"{self.base_package}.dal.mapper"
+            mapper_package=f"{self.base_package}.dal.mapper",
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
         )
         
         # 生成文件路径
@@ -318,7 +335,10 @@ class DatabaseGenerator:
         content = template.render(
             package=f"{self.base_package}.common.dto",
             dto_name=dto_name,
-            fields=fields
+            fields=fields,
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
         )
         
         # 生成文件路径
@@ -341,6 +361,38 @@ class DatabaseGenerator:
         print(f"Generated DTO: {file_path}")
         return dto_name
     
+    def generate_page_dto(self, entity_name):
+        """生成分页查询请求DTO类（每表）"""
+        page_dto_name = entity_name.replace("Entity", "PageDTO")
+        
+        template = self.env.get_template("page_dto_template.java.j2")
+        content = template.render(
+            package=f"{self.base_package}.common.dto",
+            page_dto_name=page_dto_name,
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
+        )
+        
+        output_path = os.path.join(
+            self.output_dir,
+            "scf-loan-common",
+            "src",
+            "main",
+            "java",
+            *self.base_package.split("."),
+            "common",
+            "dto"
+        )
+        os.makedirs(output_path, exist_ok=True)
+        
+        file_path = os.path.join(output_path, f"{page_dto_name}.java")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        
+        print(f"Generated Page DTO: {file_path}")
+        return page_dto_name
+    
     def generate_controller(self, entity_name, service_name, dto_name):
         """生成Controller类"""
         controller_name = entity_name.replace("Entity", "Controller")
@@ -355,9 +407,13 @@ class DatabaseGenerator:
             service_name=service_name,
             entity_name=entity_name,
             dto_name=dto_name,
+            page_dto_name=entity_name.replace("Entity","PageDTO"),
             service_package=f"{self.base_package}.biz.service",
             entity_package=f"{self.base_package}.dal.entity",
-            dto_package=f"{self.base_package}.common.dto"
+            dto_package=f"{self.base_package}.common.dto",
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
         )
         
         # 生成文件路径
@@ -396,7 +452,10 @@ class DatabaseGenerator:
                 service_name=service_name,
                 entity_name=entity_name,
                 service_package=f"{self.base_package}.biz.service",
-                entity_package=f"{self.base_package}.dal.entity"
+                entity_package=f"{self.base_package}.dal.entity",
+                generator_name=self.generator_name,
+                generator_version=self.generator_version,
+                generated_at=self.generated_at
             )
             print(f"Template rendered successfully, content length: {len(content)}")
             
@@ -532,6 +591,14 @@ class DatabaseGenerator:
             "columns": columns
         }
     
+    def validate_required_columns(self, table_schema):
+        """校验每张表必须包含的通用字段"""
+        required = {"id", "created_at", "updated_at", "created_by", "updated_by", "del_flag"}
+        cols = {c["Field"] for c in table_schema["columns"]}
+        missing = required - cols
+        if missing:
+            raise ValueError(f"Missing required columns in table {table_schema['table_name']}: {', '.join(sorted(missing))}")
+    
     def save_ddl(self, table_name, sql):
         """保存DDL语句到文件"""
         ddl_dir = os.path.join(os.path.dirname(__file__), "ddl")
@@ -569,6 +636,8 @@ class DatabaseGenerator:
                 
                 # 从SQL语句解析表结构
                 table_schema = self.parse_table_schema_from_sql(table_name, sql)
+                # 校验必备字段
+                self.validate_required_columns(table_schema)
                 
                 # 生成完整代码
                 entity_name = self.generate_entity(table_schema)
@@ -576,6 +645,7 @@ class DatabaseGenerator:
                 service_name = self.generate_service(entity_name, table_name)
                 self.generate_service_impl(service_name, entity_name, mapper_name)
                 dto_name = self.generate_dto(entity_name, table_schema)
+                page_dto_name = self.generate_page_dto(entity_name)
                 self.generate_controller(entity_name, service_name, dto_name)
                 
                 # 生成单元测试
@@ -589,6 +659,7 @@ class DatabaseGenerator:
                     os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                     os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                     os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
+                    os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
                     os.path.join(self.output_dir, "scf-loan-web", "src", "main", "java", *self.base_package.split("."), "web", "controller", f"{entity_name.replace('Entity', 'Controller')}.java")
                 ]
                 
@@ -608,6 +679,8 @@ class DatabaseGenerator:
                     self.connect()
                     # 获取表结构
                     table_schema = self.get_table_schema(table_name)
+                    # 校验必备字段
+                    self.validate_required_columns(table_schema)
                     
                     # 生成代码
                     entity_name = self.generate_entity(table_schema)
@@ -615,6 +688,7 @@ class DatabaseGenerator:
                     service_name = self.generate_service(entity_name, table_name)
                     self.generate_service_impl(service_name, entity_name, mapper_name)
                     dto_name = self.generate_dto(entity_name, table_schema)
+                    page_dto_name = self.generate_page_dto(entity_name)
                     self.generate_controller(entity_name, service_name, dto_name)
                     
                     # 生成单元测试
@@ -628,6 +702,7 @@ class DatabaseGenerator:
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                         os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
+                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-web", "src", "main", "java", *self.base_package.split("."), "web", "controller", f"{entity_name.replace('Entity', 'Controller')}.java")
                     ]
                     
@@ -682,6 +757,8 @@ class DatabaseGenerator:
                     
                     # 从SQL语句解析表结构
                     table_schema = self.parse_table_schema_from_sql(table_name, sql)
+                    # 校验必备字段
+                    self.validate_required_columns(table_schema)
                     
                     # 生成完整代码
                     entity_name = self.generate_entity(table_schema)
@@ -689,6 +766,7 @@ class DatabaseGenerator:
                     service_name = self.generate_service(entity_name, table_name)
                     self.generate_service_impl(service_name, entity_name, mapper_name)
                     dto_name = self.generate_dto(entity_name, table_schema)
+                    page_dto_name = self.generate_page_dto(entity_name)
                     self.generate_controller(entity_name, service_name, dto_name)
                     
                     # 生成单元测试
@@ -702,6 +780,7 @@ class DatabaseGenerator:
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                         os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
+                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-web", "src", "main", "java", *self.base_package.split("."), "web", "controller", f"{entity_name.replace('Entity', 'Controller')}.java")
                     ]
                     
