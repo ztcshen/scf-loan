@@ -646,7 +646,6 @@ class DatabaseGenerator:
                 self.generate_service_impl(service_name, entity_name, mapper_name)
                 dto_name = self.generate_dto(entity_name, table_schema)
                 page_dto_name = self.generate_page_dto(entity_name)
-                self.generate_controller(entity_name, service_name, dto_name)
                 
                 # 生成单元测试
                 if generate_tests:
@@ -659,8 +658,7 @@ class DatabaseGenerator:
                     os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                     os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                     os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
-                    os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
-                    os.path.join(self.output_dir, "scf-loan-web", "src", "main", "java", *self.base_package.split("."), "web", "controller", f"{entity_name.replace('Entity', 'Controller')}.java")
+                    os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java")
                 ]
                 
                 if generate_tests:
@@ -689,7 +687,6 @@ class DatabaseGenerator:
                     self.generate_service_impl(service_name, entity_name, mapper_name)
                     dto_name = self.generate_dto(entity_name, table_schema)
                     page_dto_name = self.generate_page_dto(entity_name)
-                    self.generate_controller(entity_name, service_name, dto_name)
                     
                     # 生成单元测试
                     if generate_tests:
@@ -702,8 +699,7 @@ class DatabaseGenerator:
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                         os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
-                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
-                        os.path.join(self.output_dir, "scf-loan-web", "src", "main", "java", *self.base_package.split("."), "web", "controller", f"{entity_name.replace('Entity', 'Controller')}.java")
+                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java")
                     ]
                     
                     if generate_tests:
@@ -767,7 +763,6 @@ class DatabaseGenerator:
                     self.generate_service_impl(service_name, entity_name, mapper_name)
                     dto_name = self.generate_dto(entity_name, table_schema)
                     page_dto_name = self.generate_page_dto(entity_name)
-                    self.generate_controller(entity_name, service_name, dto_name)
                     
                     # 生成单元测试
                     if generate_tests:
@@ -780,8 +775,7 @@ class DatabaseGenerator:
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                         os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
-                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
-                        os.path.join(self.output_dir, "scf-loan-web", "src", "main", "java", *self.base_package.split("."), "web", "controller", f"{entity_name.replace('Entity', 'Controller')}.java")
+                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java")
                     ]
                     
                     if generate_tests:
