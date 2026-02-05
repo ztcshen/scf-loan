@@ -317,15 +317,24 @@ class DatabaseGenerator:
         dto_name = entity_name.replace("Entity", "DTO")
         fields = []
         
+        # BasePageRequestDTO fields to exclude
+        base_dto_fields = {"id", "page", "size", "startTime", "endTime"}
+        
         for column in table_schema["columns"]:
             column_name = column["Field"]
+            field_name = self.camel_case(column_name)
+            
+            # Skip fields that exist in BasePageRequestDTO
+            if field_name in base_dto_fields:
+                continue
+                
             column_type = column["Type"]
             column_comment = column["Comment"]
             java_type = self.get_java_type(column_type)
             
             fields.append({
                 "column_name": column_name,
-                "field_name": self.camel_case(column_name),
+                "field_name": field_name,
                 "java_type": java_type,
                 "comment": column_comment
             })
@@ -392,6 +401,47 @@ class DatabaseGenerator:
         
         print(f"Generated Page DTO: {file_path}")
         return page_dto_name
+    
+    def generate_converter(self, entity_name, table_schema):
+        """生成实体/DTO转换工具类（放在biz模块，依赖common和dal）"""
+        dto_name = entity_name.replace("Entity", "DTO")
+        converter_name = entity_name.replace("Entity", "Converter")
+        fields = []
+        for column in table_schema["columns"]:
+            column_name = column["Field"]
+            fields.append({
+                "field_name": self.camel_case(column_name),
+                "method_suffix": (self.camel_case(column_name)[0].upper() + self.camel_case(column_name)[1:]) if self.camel_case(column_name) else ""
+            })
+        template = self.env.get_template("converter_template.java.j2")
+        content = template.render(
+            package=f"{self.base_package}.biz.convert",
+            entity_name=entity_name,
+            dto_name=dto_name,
+            converter_name=converter_name,
+            entity_package=f"{self.base_package}.dal.entity",
+            dto_package=f"{self.base_package}.common.dto",
+            fields=fields,
+            generator_name=self.generator_name,
+            generator_version=self.generator_version,
+            generated_at=self.generated_at
+        )
+        output_path = os.path.join(
+            self.output_dir,
+            "scf-loan-biz",
+            "src",
+            "main",
+            "java",
+            *self.base_package.split("."),
+            "biz",
+            "convert"
+        )
+        os.makedirs(output_path, exist_ok=True)
+        file_path = os.path.join(output_path, f"{converter_name}.java")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"Generated Converter: {file_path}")
+        return converter_name
     
     def generate_controller(self, entity_name, service_name, dto_name):
         """生成Controller类"""
@@ -646,6 +696,7 @@ class DatabaseGenerator:
                 self.generate_service_impl(service_name, entity_name, mapper_name)
                 dto_name = self.generate_dto(entity_name, table_schema)
                 page_dto_name = self.generate_page_dto(entity_name)
+                converter_name = self.generate_converter(entity_name, table_schema)
                 
                 # 生成单元测试
                 if generate_tests:
@@ -658,7 +709,8 @@ class DatabaseGenerator:
                     os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                     os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                     os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
-                    os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java")
+                    os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
+                    os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "convert", f"{converter_name}.java")
                 ]
                 
                 if generate_tests:
@@ -687,6 +739,7 @@ class DatabaseGenerator:
                     self.generate_service_impl(service_name, entity_name, mapper_name)
                     dto_name = self.generate_dto(entity_name, table_schema)
                     page_dto_name = self.generate_page_dto(entity_name)
+                    converter_name = self.generate_converter(entity_name, table_schema)
                     
                     # 生成单元测试
                     if generate_tests:
@@ -699,7 +752,8 @@ class DatabaseGenerator:
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                         os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
-                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java")
+                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
+                        os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "convert", f"{converter_name}.java")
                     ]
                     
                     if generate_tests:
@@ -763,6 +817,7 @@ class DatabaseGenerator:
                     self.generate_service_impl(service_name, entity_name, mapper_name)
                     dto_name = self.generate_dto(entity_name, table_schema)
                     page_dto_name = self.generate_page_dto(entity_name)
+                    converter_name = self.generate_converter(entity_name, table_schema)
                     
                     # 生成单元测试
                     if generate_tests:
@@ -775,7 +830,8 @@ class DatabaseGenerator:
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", f"{service_name}.java"),
                         os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "service", "impl", f"{service_name}Impl.java"),
                         os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{dto_name}.java"),
-                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java")
+                        os.path.join(self.output_dir, "scf-loan-common", "src", "main", "java", *self.base_package.split("."), "common", "dto", f"{page_dto_name}.java"),
+                        os.path.join(self.output_dir, "scf-loan-biz", "src", "main", "java", *self.base_package.split("."), "biz", "convert", f"{converter_name}.java")
                     ]
                     
                     if generate_tests:

@@ -156,6 +156,34 @@ class DatabaseRemover:
         )
         file_paths.append(dto_path)
         
+        # Converter文件（位于biz模块）
+        converter_name = class_names['entity_name'].replace("Entity", "Converter")
+        converter_path_biz = os.path.join(
+            self.base_dir,
+            "scf-loan-biz",
+            "src",
+            "main",
+            "java",
+            package_path,
+            "biz",
+            "convert",
+            f"{converter_name}.java"
+        )
+        file_paths.append(converter_path_biz)
+        # 兼容旧位置（common模块）
+        converter_path_common = os.path.join(
+            self.base_dir,
+            "scf-loan-common",
+            "src",
+            "main",
+            "java",
+            package_path,
+            "common",
+            "convert",
+            f"{converter_name}.java"
+        )
+        file_paths.append(converter_path_common)
+        
         # Controller文件
         controller_path = os.path.join(
             self.base_dir,

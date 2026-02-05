@@ -14,7 +14,7 @@ import {{ mapper_package }}.{{ mapper_name }};
 import com.scf.loan.common.dto.PageResult;
 import {{ package|replace('.biz.service.impl','') }}.common.dto.{{ entity_name|replace('Entity','PageDTO') }};
 import {{ package|replace('.biz.service.impl','') }}.common.dto.{{ entity_name|replace('Entity','DTO') }};
-import org.springframework.beans.BeanUtils;
+import {{ package|replace('.biz.service.impl','') }}.biz.convert.{{ entity_name|replace('Entity','Converter') }};
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 
@@ -51,9 +51,7 @@ public class {{ service_impl_name }} extends ServiceImpl<{{ mapper_name }}, {{ e
         Page<{{ entity_name }}> p = page(new Page<>(dto.getPage(), dto.getSize()), qw);
         java.util.List<{{ entity_name|replace('Entity','DTO') }}> dtos = new java.util.ArrayList<>();
         for ({{ entity_name }} e : p.getRecords()) {
-            {{ entity_name|replace('Entity','DTO') }} d = new {{ entity_name|replace('Entity','DTO') }}();
-            BeanUtils.copyProperties(e, d);
-            dtos.add(d);
+            dtos.add({{ entity_name|replace('Entity','Converter') }}.toDTO(e));
         }
         return PageResult.of(dtos, p.getTotal(), dto.getPage(), dto.getSize());
     }
