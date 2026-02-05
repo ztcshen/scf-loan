@@ -105,6 +105,12 @@ class DatabaseGenerator:
             parts = parts[1:]
         return ''.join(x.title() for x in parts)
     
+    def kebab_from_pascal(self, s):
+        """将帕斯卡命名转换为kebab-case"""
+        base = re.sub(r'Entity$', '', s)
+        kebab = re.sub(r'([a-z0-9])([A-Z])', r'\1-\2', base).lower()
+        return kebab
+    
     def get_java_type(self, mysql_type):
         """MySQL类型转Java类型"""
         type_mapping = {
@@ -337,7 +343,7 @@ class DatabaseGenerator:
     def generate_controller(self, entity_name, service_name, dto_name):
         """生成Controller类"""
         controller_name = entity_name.replace("Entity", "Controller")
-        api_path = "/api/" + entity_name.replace("Entity", "").lower()
+        api_path = "/api/" + self.kebab_from_pascal(entity_name)
         
         # 渲染模板
         template = self.env.get_template("controller_template.java.j2")
@@ -739,10 +745,15 @@ def main(db_url, db_username, db_password, table, ddl, output_dir, validate, gen
     # 加载配置
     config = load_config()
     
-    # 使用配置文件中的值（如果存在）
-    db_url = config.get("db_url", db_url)
-    db_username = config.get("db_username", db_username)
-    db_password = config.get("db_password", db_password)
+    # 环境变量优先生效
+    env_db_url = os.environ.get("SCF_DB_URL")
+    env_db_username = os.environ.get("SCF_DB_USERNAME")
+    env_db_password = os.environ.get("SCF_DB_PASSWORD")
+
+    # 使用环境变量或配置文件中的值（如果存在）
+    db_url = env_db_url or config.get("db_url", db_url)
+    db_username = env_db_username or config.get("db_username", db_username)
+    db_password = env_db_password or config.get("db_password", db_password)
     
     # 创建生成器
     generator = DatabaseGenerator(

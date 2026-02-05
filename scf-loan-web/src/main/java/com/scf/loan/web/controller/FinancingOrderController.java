@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * FinancingOrder控制器
  */
 @RestController
-@RequestMapping("/api/financingorder")
+@RequestMapping("/api/financing-order")
 public class FinancingOrderController {
 
     // @Autowired
