@@ -14,13 +14,15 @@ import urllib.error
 
 
 class ServiceRunner:
-    def __init__(self, project_dir):
+    def __init__(self, project_dir, service_url=None, wait_seconds=10, skip_build=False):
         """初始化服务运行器"""
         self.project_dir = project_dir
         self.web_module_dir = os.path.join(project_dir, "scf-loan-web")
-        self.service_url = "http://localhost:8081/api/financing-order/health"
+        self.service_url = service_url or os.environ.get("SCF_SERVICE_URL", "http://localhost:8081/api/financing-order/health")
         self.service_process = None
         self.maven_command = "mvn"
+        self.wait_seconds = wait_seconds
+        self.skip_build = skip_build
     
     def check_maven(self):
         """检查Maven是否安装"""
@@ -54,6 +56,9 @@ class ServiceRunner:
     
     def compile_service(self):
         """编译服务"""
+        if self.skip_build:
+            print("跳过服务编译")
+            return True
         print("开始编译服务...")
         print(f"执行命令：{self.maven_command} clean install -DskipTests")
         print(f"工作目录：{self.project_dir}")
@@ -103,7 +108,7 @@ class ServiceRunner:
             
             # 等待服务启动
             print("正在启动服务，请稍候...")
-            time.sleep(10)  # 等待10秒，让服务有足够的时间启动
+            time.sleep(self.wait_seconds)
             
             return True
         except Exception as e:
@@ -188,14 +193,17 @@ class ServiceRunner:
 
 @click.command()
 @click.option('--project-dir', default='.', help='项目根目录')
-def main(project_dir):
+@click.option('--service-url', default=None, help='健康检查URL')
+@click.option('--wait-seconds', default=10, type=int, help='服务启动等待秒数')
+@click.option('--skip-build', is_flag=True, default=False, help='跳过编译步骤')
+def main(project_dir, service_url, wait_seconds, skip_build):
     """服务编译运行工具"""
     # 转换为绝对路径
     project_dir = os.path.abspath(project_dir)
     print(f"项目根目录：{project_dir}")
     
     # 创建服务运行器
-    runner = ServiceRunner(project_dir)
+    runner = ServiceRunner(project_dir, service_url=service_url, wait_seconds=wait_seconds, skip_build=skip_build)
     
     # 运行完整流程
     success = runner.run_full_process()

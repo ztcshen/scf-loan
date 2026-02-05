@@ -16,13 +16,14 @@ from jinja2 import Template, FileSystemLoader, Environment
 
 
 class DatabaseGenerator:
-    def __init__(self, db_url, username, password, base_package="com.scf.loan", output_dir="."):
+    def __init__(self, db_url, username, password, base_package="com.scf.loan", output_dir=".", api_prefix="/api"):
         """初始化数据库连接"""
         self.db_url = db_url
         self.username = username
         self.password = password
         self.base_package = base_package
         self.output_dir = output_dir
+        self.api_prefix = api_prefix.rstrip("/")
         self.db = None
         self.cursor = None
         self.templates_dir = os.path.join(os.path.dirname(__file__), "templates")
@@ -343,7 +344,7 @@ class DatabaseGenerator:
     def generate_controller(self, entity_name, service_name, dto_name):
         """生成Controller类"""
         controller_name = entity_name.replace("Entity", "Controller")
-        api_path = "/api/" + self.kebab_from_pascal(entity_name)
+        api_path = f"{self.api_prefix}/" + self.kebab_from_pascal(entity_name)
         
         # 渲染模板
         template = self.env.get_template("controller_template.java.j2")
@@ -740,7 +741,8 @@ def load_config():
 @click.option('--output-dir', default='.', help='Output Directory')
 @click.option('--validate', is_flag=True, default=False, help='Validate Generated Code')
 @click.option('--generate-tests', is_flag=True, default=True, help='Generate Unit Tests')
-def main(db_url, db_username, db_password, table, ddl, output_dir, validate, generate_tests):
+@click.option('--api-prefix', default=None, help='API 前缀，默认 /api')
+def main(db_url, db_username, db_password, table, ddl, output_dir, validate, generate_tests, api_prefix):
     """数据库表代码生成工具"""
     # 加载配置
     config = load_config()
@@ -749,11 +751,13 @@ def main(db_url, db_username, db_password, table, ddl, output_dir, validate, gen
     env_db_url = os.environ.get("SCF_DB_URL")
     env_db_username = os.environ.get("SCF_DB_USERNAME")
     env_db_password = os.environ.get("SCF_DB_PASSWORD")
+    env_api_prefix = os.environ.get("SCF_API_PREFIX")
 
     # 使用环境变量或配置文件中的值（如果存在）
     db_url = env_db_url or config.get("db_url", db_url)
     db_username = env_db_username or config.get("db_username", db_username)
     db_password = env_db_password or config.get("db_password", db_password)
+    api_prefix = (env_api_prefix or api_prefix or "/api")
     
     # 创建生成器
     generator = DatabaseGenerator(
@@ -761,7 +765,8 @@ def main(db_url, db_username, db_password, table, ddl, output_dir, validate, gen
         username=db_username,
         password=db_password,
         base_package="com.scf.loan",
-        output_dir=output_dir
+        output_dir=output_dir,
+        api_prefix=api_prefix
     )
     
     # 生成代码

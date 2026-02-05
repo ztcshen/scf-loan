@@ -86,6 +86,18 @@ class GitCommit:
         
         return changed_files
     
+    def filter_changed_files(self, changed_files):
+        """过滤构建产物，仅保留源码与脚本改动"""
+        filtered = []
+        for f in changed_files:
+            p = f['path'].replace('\\', '/')
+            if p.startswith('target/') or '/target/' in p:
+                continue
+            if p.endswith('.class') or p.endswith('.jar') or p.endswith('.lst'):
+                continue
+            filtered.append(f)
+        return filtered
+    
     def run_tests(self):
         """执行单元测试"""
         if self.skip_tests:
@@ -119,6 +131,8 @@ class GitCommit:
     def generate_change_summary(self, changed_files):
         """生成改动点总结"""
         print("分析改动点...")
+        
+        changed_files = self.filter_changed_files(changed_files)
         
         summary = {
             "total": len(changed_files),
@@ -248,7 +262,7 @@ class GitCommit:
         
         return detailed_description
     
-    def commit_changes(self, summary_text):
+    def commit_changes(self, summary_text, changed_files):
         """执行Git提交"""
         print("准备提交代码...")
         
@@ -258,10 +272,15 @@ class GitCommit:
         if self.verbose:
             print(f"提交信息: {commit_message}")
         
-        # 添加所有改动文件
-        result = self.run_command("git add .")
-        if result.returncode != 0:
-            raise Exception("Git add 操作失败")
+        # 仅添加过滤后的改动文件
+        changed_files = self.filter_changed_files(changed_files)
+        if not changed_files:
+            raise Exception("没有可提交的源码改动")
+        for f in changed_files:
+            path = f['path']
+            add_result = self.run_command(f'git add "{path}"')
+            if add_result.returncode != 0:
+                raise Exception(f"Git add 失败: {path}")
         
         # 执行提交
         result = self.run_command(f"git commit -m \"{commit_message}\"")
@@ -295,7 +314,7 @@ class GitCommit:
             summary_text = self.generate_change_summary(changed_files)
             
             # 5. 执行提交
-            commit_hash = self.commit_changes(summary_text)
+            commit_hash = self.commit_changes(summary_text, changed_files)
             
             print("\nGit提交流程执行完成！")
             print(f"提交结果: 成功")
