@@ -1,6 +1,5 @@
 package com.scf.loan.web.handler;
 
-import com.scf.loan.common.enums.ResultCodeEnum;
 import com.scf.loan.common.exception.ServiceException;
 import com.scf.loan.common.exception.ValidateException;
 import org.junit.jupiter.api.BeforeEach;

@@ -6,22 +6,29 @@
  */
 package {{ package }};
 
-import {{ service_package }}.{{ service_name }};
-import {{ entity_package }}.{{ entity_name }};
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scf.loan.common.dto.PageResult;
+import {{ entity_package }}.{{ entity_name }};
+import {{ mapper_package }}.{{ mapper_name }};
 import {{ package|replace('.biz.service.impl','') }}.common.dto.{{ entity_name|replace('Entity','PageDTO') }};
 import {{ package|replace('.biz.service.impl','') }}.common.dto.{{ entity_name|replace('Entity','DTO') }};
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -31,8 +38,12 @@ public class {{ test_name }} {
 
     private static final Logger logger = LoggerFactory.getLogger({{ test_name }}.class);
 
+    @InjectMocks
+    @Spy
+    private {{ service_impl_name }} {{ service_name|lower|replace('service', '') }}Service;
+
     @Mock
-    private {{ service_name }} {{ service_name|lower|replace('service', '') }}Service;
+    private {{ mapper_name }} {{ mapper_name|lower|replace('mapper', '') }}Mapper;
 
     @BeforeEach
     public void setUp() {
@@ -47,26 +58,17 @@ public class {{ test_name }} {
         logger.info("开始执行测试批量创建{{ entity_name|replace('Entity', '') }}");
         
         List<{{ entity_name }}> entities = new ArrayList<>();
-        
-        // 创建测试数据
-        {{ entity_name }} entity1 = new {{ entity_name }}();
-        // 设置测试数据
-        // entity1.setXXX(XXX);
-        entities.add(entity1);
-        
-        {{ entity_name }} entity2 = new {{ entity_name }}();
-        // 设置测试数据
-        // entity2.setXXX(XXX);
-        entities.add(entity2);
-        
-        // 模拟返回值
-        when({{ service_name|lower|replace('service', '') }}Service.batchCreate{{ entity_name|replace('Entity', '') }}(entities)).thenReturn(true);
-        
+        {{ entity_name }} entity = new {{ entity_name }}();
+        entity.setId(1L);
+        entities.add(entity);
+
+        // 模拟 saveBatch 返回 true
+        doReturn(true).when({{ service_name|lower|replace('service', '') }}Service).saveBatch(entities);
+
         boolean result = {{ service_name|lower|replace('service', '') }}Service.batchCreate{{ entity_name|replace('Entity', '') }}(entities);
         assertTrue(result);
         
-        // 验证方法调用
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).batchCreate{{ entity_name|replace('Entity', '') }}(entities);
+        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).saveBatch(entities);
         
         logger.info("测试批量创建{{ entity_name|replace('Entity', '') }}执行完成");
     }
@@ -78,22 +80,18 @@ public class {{ test_name }} {
     public void testBatchUpdate{{ entity_name|replace('Entity', '') }}() {
         logger.info("开始执行测试批量更新{{ entity_name|replace('Entity', '') }}");
         
-        // 创建测试数据
         List<{{ entity_name }}> entities = new ArrayList<>();
-        
-        {{ entity_name }} entity1 = new {{ entity_name }}();
-        // 设置测试数据
-        // entity1.setXXX(XXX);
-        entities.add(entity1);
-        
-        // 模拟返回值
-        when({{ service_name|lower|replace('service', '') }}Service.batchUpdate{{ entity_name|replace('Entity', '') }}(entities)).thenReturn(true);
-        
+        {{ entity_name }} entity = new {{ entity_name }}();
+        entity.setId(1L);
+        entities.add(entity);
+
+        // 模拟 updateBatchById 返回 true
+        doReturn(true).when({{ service_name|lower|replace('service', '') }}Service).updateBatchById(entities);
+
         boolean result = {{ service_name|lower|replace('service', '') }}Service.batchUpdate{{ entity_name|replace('Entity', '') }}(entities);
         assertTrue(result);
         
-        // 验证方法调用
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).batchUpdate{{ entity_name|replace('Entity', '') }}(entities);
+        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).updateBatchById(entities);
         
         logger.info("测试批量更新{{ entity_name|replace('Entity', '') }}执行完成");
     }
@@ -102,22 +100,72 @@ public class {{ test_name }} {
      * 测试分页查询{{ entity_name|replace('Entity', '') }}
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void testPage{{ entity_name|replace('Entity', '') }}() {
         logger.info("开始执行测试分页查询{{ entity_name|replace('Entity', '') }}");
+
+        {{ entity_name|replace('Entity','PageDTO') }} pageDTO = new {{ entity_name|replace('Entity','PageDTO') }}();
+        pageDTO.setPage(1);
+        pageDTO.setSize(10);
+        pageDTO.setId(1L);
+        pageDTO.setStartTime(LocalDateTime.now().minusDays(1));
+        pageDTO.setEndTime(LocalDateTime.now());
+
+        {{ entity_name }} entity = new {{ entity_name }}();
+        entity.setId(1L);
+        entity.setCreatedAt(LocalDateTime.now());
         
-        {{ entity_name|replace('Entity','PageDTO') }} dto = new {{ entity_name|replace('Entity','PageDTO') }}();
-        dto.setPage(1);
-        dto.setSize(10);
-        PageResult<{{ entity_name|replace('Entity','DTO') }}> mockResult = new PageResult<>();
-        mockResult.setRecords(new ArrayList<{{ entity_name|replace('Entity','DTO') }}>());
-        mockResult.setPage(1);
-        mockResult.setSize(10);
-        when({{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(dto)).thenReturn(mockResult);
+        Page<{{ entity_name }}> page = new Page<>();
+        page.setRecords(Collections.singletonList(entity));
+        page.setTotal(1);
+
+        // 模拟 page 方法
+        doReturn(page).when({{ service_name|lower|replace('service', '') }}Service).page(any(Page.class), any(QueryWrapper.class));
+
+        PageResult<{{ entity_name|replace('Entity','DTO') }}> result = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(pageDTO);
         
-        PageResult<{{ entity_name|replace('Entity','DTO') }}> pageResult = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(dto);
-        
-        assertNotNull(pageResult);
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page{{ entity_name|replace('Entity', '') }}(dto);
+        assertNotNull(result);
+        assertEquals(1, result.getTotal());
+        assertEquals(1, result.getRecords().size());
+        assertEquals(1L, result.getRecords().get(0).getId());
+
+        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page(any(Page.class), any(QueryWrapper.class));
+
         logger.info("测试分页查询{{ entity_name|replace('Entity', '') }}执行完成");
+    }
+
+    /**
+     * 测试分页查询{{ entity_name|replace('Entity', '') }} - 空条件
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testPage{{ entity_name|replace('Entity', '') }}WithEmptyConditions() {
+        logger.info("开始执行测试分页查询{{ entity_name|replace('Entity', '') }} - 空条件");
+
+        {{ entity_name|replace('Entity','PageDTO') }} pageDTO = new {{ entity_name|replace('Entity','PageDTO') }}();
+        pageDTO.setPage(1);
+        pageDTO.setSize(10);
+        // 不设置任何查询条件
+
+        {{ entity_name }} entity = new {{ entity_name }}();
+        entity.setId(1L);
+        entity.setCreatedAt(LocalDateTime.now());
+        
+        Page<{{ entity_name }}> page = new Page<>();
+        page.setRecords(Collections.singletonList(entity));
+        page.setTotal(1);
+
+        // 模拟 page 方法
+        doReturn(page).when({{ service_name|lower|replace('service', '') }}Service).page(any(Page.class), any(QueryWrapper.class));
+
+        PageResult<{{ entity_name|replace('Entity','DTO') }}> result = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(pageDTO);
+        
+        assertNotNull(result);
+        assertEquals(1, result.getTotal());
+        assertEquals(1, result.getRecords().size());
+
+        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page(any(Page.class), any(QueryWrapper.class));
+
+        logger.info("测试分页查询{{ entity_name|replace('Entity', '') }} - 空条件 执行完成");
     }
 }

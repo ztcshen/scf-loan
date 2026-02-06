@@ -25,7 +25,7 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class {{ dto_name }} extends BasePageRequestDTO implements Serializable {
+public class {{ dto_name }} implements Serializable {
     private static final long serialVersionUID = 1L;
 
 {% for field in fields %}

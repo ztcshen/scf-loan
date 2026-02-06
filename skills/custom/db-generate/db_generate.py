@@ -318,7 +318,9 @@ class DatabaseGenerator:
         fields = []
         
         # BasePageRequestDTO fields to exclude
-        base_dto_fields = {"id", "page", "size", "startTime", "endTime"}
+        # Only exclude fields that are not needed in the response DTO but might match DB columns (unlikely for page/size)
+        # We want 'id' in the response DTO, so we don't exclude it.
+        base_dto_fields = {"page", "size", "startTime", "endTime"}
         
         for column in table_schema["columns"]:
             column_name = column["Field"]
@@ -525,9 +527,12 @@ class DatabaseGenerator:
                 package=f"{self.base_package}.biz.service.impl",
                 test_name=test_name,
                 service_name=service_name,
+                service_impl_name=service_name + "Impl",
                 entity_name=entity_name,
+                mapper_name=entity_name.replace("Entity", "Mapper"),
                 service_package=f"{self.base_package}.biz.service",
                 entity_package=f"{self.base_package}.dal.entity",
+                mapper_package=f"{self.base_package}.dal.mapper",
                 generator_name=self.generator_name,
                 generator_version=self.generator_version,
                 generated_at=self.generated_at
