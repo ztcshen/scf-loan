@@ -10,6 +10,7 @@ This directory contains third-party or generic skills imported from the [Anthrop
 | `mcp-builder` | Tools and guides for building Model Context Protocol (MCP) servers. | [modelcontextprotocol](https://modelcontextprotocol.io) |
 | `webapp-testing` | Utilities for automated web application testing (Playwright/Selenium integration). | [anthropic-agent-skills](https://github.com/anthropics/agent-skills) |
 | `doc-coauthoring` | Structured workflow for collaborative documentation creation. | [anthropic-agent-skills](https://github.com/anthropics/agent-skills) |
+| `xlsx` | Skills for creating, reading, and editing Excel spreadsheets (using pandas/openpyxl). | [anthropic-agent-skills](https://github.com/anthropics/agent-skills) |
 
 ## Maintenance Guidelines
 
