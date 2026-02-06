@@ -365,7 +365,7 @@ class GitCommit:
 def main(message, branch, skip_tests, skip_build, verbose):
     """Git 提交代码脚本"""
     # 确定项目目录
-    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     
     print(f"项目目录: {project_dir}")
     print(f"提交信息: {message}")
