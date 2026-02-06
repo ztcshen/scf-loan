@@ -1,0 +1,17 @@
+# Vendor Skills
+
+This directory contains third-party or generic skills imported from open-source repositories (e.g., Anthropic's Agent Skills repository). These skills provide general-purpose capabilities and tools.
+
+## Skills Overview
+
+| Skill Name | Description | Source/Origin |
+|------------|-------------|---------------|
+| `skill-creator` | The meta-skill for creating and validating new skills. Follows the official Agent Skills specification. | [anthropic-agent-skills](https://github.com/anthropics/agent-skills) |
+| `mcp-builder` | Tools and guides for building Model Context Protocol (MCP) servers. | [modelcontextprotocol](https://modelcontextprotocol.io) |
+| `webapp-testing` | Utilities for automated web application testing (Playwright/Selenium integration). | [anthropic-agent-skills](https://github.com/anthropics/agent-skills) |
+
+## Maintenance Guidelines
+
+- **Upstream Updates**: These skills should generally be kept in sync with their upstream repositories.
+- **Minimal Modification**: Avoid modifying the core logic of these skills unless necessary. If project-specific adaptation is needed, consider wrapping them or moving them to `../custom`.
+- **Structure**: Maintain the standard structure (`SKILL.md`, `scripts/`, `reference/`) to ensure compatibility.
