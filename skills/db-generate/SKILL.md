@@ -1,103 +1,54 @@
 ---
 name: db-generate
-description: 数据库表代码生成工具，根据数据库表结构自动生成实体类、Mapper、Service、DTO、ServiceImpl 等基础代码，并提供代码验证和单元测试生成功能（当前版本不生成 Controller，外部暴露由其他技能负责）
-metadata:
-  emoji: "🗄️"
-  requires:
-    - name: mysql
-      type: binary
-      description: MySQL 客户端工具
-    - name: java
-      type: binary
-      description: Java 开发环境
-    - name: maven
-      type: binary
-      description: Maven 构建工具
-  install:
-    - name: mysql
-      command: "下载并安装 MySQL 客户端: https://dev.mysql.com/downloads/mysql/"
-    - name: java
-      command: "下载并安装 JDK 8+: https://www.oracle.com/java/technologies/downloads/"
-    - name: maven
-      command: "下载并安装 Maven: https://maven.apache.org/download.cgi"
-  examples:
-    - name: 生成单个表的代码
-      command: "python db_generate.py --table t_scf_financing_order --output-dir scf-loan-dal/src/main/java"
-    - name: 生成多个表的代码
-      command: "python db_generate.py --tables t_scf_financing_order,t_scf_repayment_plan --output-dir scf-loan-dal/src/main/java"
-    - name: 生成完整模块代码
-      command: "python db_generate.py --table t_scf_financing_order --output-dir . --full-module"
-    - name: 生成代码并验证
-      command: "python db_generate.py --table t_scf_financing_order --validate"
-    - name: 生成单元测试
-      command: "python db_generate.py --table t_scf_financing_order --generate-tests"
-  tags:
-    - database
-    - code-generation
-    - java
-    - mybatis-plus
-    - validation
-    - unit-test
-  author: scf-team
-  version: "1.0.0"
-  category: development
-  platforms:
-    - windows
-    - macos
-    - linux
-  support:
-    issues: "https://github.com/scf-team/scf-loan/issues"
-    email: "support@scf-team.com"
-  license:
-    name: MIT
-    url: "https://opensource.org/licenses/MIT"
-  privacy:
-    policy: "本工具仅在本地运行，不收集任何数据"
-    compliance: "符合 GDPR 和其他数据保护法规"
-  security:
-    vulnerabilities: "无已知漏洞"
-    best_practices: "使用参数化查询，避免 SQL 注入"
-  dependencies:
-    - name: pymysql
-      version: "^1.0.2"
-    - name: jinja2
-      version: "^3.0.3"
-    - name: click
-      version: "^8.0.4"
-    - name: pycodestyle
-      version: "^2.8.0"
-  configuration:
-    - name: db_url
-      type: string
-      description: 数据库连接 URL
-      required: true
-    - name: db_username
-      type: string
-      description: 数据库用户名
-      required: true
-    - name: db_password
-      type: string
-      description: 数据库密码
-      required: true
-    - name: base_package
-      type: string
-      description: 基础包名
-      default: "com.scf.loan"
-    - name: output_dir
-      type: string
-      description: 输出目录
-      default: "."
-    - name: validate_code
-      type: boolean
-      description: 是否验证生成的代码
-      default: false
-    - name: generate_tests
-      type: boolean
-      description: 是否生成单元测试
-      default: false
-  usage:
-    - step: "配置数据库连接信息"
-      command: "在 config.yml 中设置数据库连接参数"
+description: Use this skill to generate Java code (Entity, Mapper, Service, DTO, etc.) from database tables. Trigger when the user asks to "generate code for table X", "create entity for table Y", or "scaffold code from DB".
+---
+
+# Database Code Generator
+
+This skill automates the generation of standard Java/MyBatis-Plus code artifacts from MySQL database tables.
+
+## Usage
+
+### 1. Generate Code for a Table
+
+To generate code for a specific table (e.g., `t_scf_financing_order`):
+
+```bash
+python db_generate.py --table t_scf_financing_order --output-dir scf-loan-dal/src/main/java
+```
+
+### 2. Generate Multiple Tables (Not Supported via CLI)
+
+Currently the script supports one table at a time. Run the command multiple times for multiple tables.
+
+### 3. Generate Full Module (Default behavior)
+
+The script generates Entity, Mapper, Service, ServiceImpl, DTO, and Convert classes by default.
+Use `--generate-tests` to add unit tests.
+
+```bash
+python db_generate.py --table t_scf_financing_order --output-dir . --generate-tests
+```
+
+### 4. Validate Generated Code
+
+```bash
+python db_generate.py --table t_scf_financing_order --validate
+```
+
+## Configuration
+
+Ensure `config.yml` is configured with correct DB credentials before running.
+
+## Generated Artifacts
+
+| Artifact | Package | Description |
+|----------|---------|-------------|
+| Entity | `.dal.entity` | JPA/MyBatis-Plus entity class |
+| Mapper | `.dal.mapper` | MyBatis mapper interface |
+| Service | `.biz.service` | Business logic interface |
+| Impl | `.biz.service.impl` | Service implementation |
+| DTO | `.common.dto` | Data Transfer Objects |
     - step: "运行代码生成工具"
       command: "python db_generate.py --table <table_name>"
     - step: "验证生成的代码"

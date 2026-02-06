@@ -1,103 +1,48 @@
 ---
 name: git-commit
-description: 自动化 Git 代码提交工具，集成代码检查、单元测试、编译验证和改动总结功能，确保提交代码的质量和规范性。
-metadata:
-  emoji: "📦"
-  requires:
-    - name: python
-      type: binary
-      description: Python 运行环境
-    - name: git
-      type: binary
-      description: Git 版本控制工具
-    - name: maven
-      type: binary
-      description: Maven 构建工具
-  install:
-    - name: python
-      command: "安装 Python 3.6+: https://www.python.org/downloads/"
-    - name: git
-      command: "安装 Git: https://git-scm.com/downloads"
-    - name: maven
-      command: "安装 Maven 3.6+: https://maven.apache.org/download.cgi"
-    - name: dependencies
-      command: "pip install -r requirements.txt (PyYAML, Click)"
-  examples:
-    - name: 基本提交
-      command: "python git_commit.py --message \"feat: 添加用户登录功能\""
-    - name: 跳过测试提交（紧急修复）
-      command: "python git_commit.py --message \"fix: 修复NPE问题\" --skip-tests"
-    - name: 跳过编译提交
-      command: "python git_commit.py --message \"docs: 更新文档\" --skip-build"
-    - name: 指定分支提交
-      command: "python git_commit.py --message \"chore: 合并分支\" --branch develop"
-    - name: 详细模式
-      command: "python git_commit.py --message \"refactor: 重构核心逻辑\" --verbose"
-  tags:
-    - git
-    - automation
-    - workflow
-    - testing
-    - maven
-  author: scf-team
-  version: "1.0.0"
-  category: devops
-  platforms:
-    - windows
-    - macos
-    - linux
-  support:
-    issues: "https://github.com/scf-team/scf-loan/issues"
-    email: "support@scf-team.com"
-  license:
-    name: MIT
-    url: "https://opensource.org/licenses/MIT"
-  privacy:
-    policy: "本工具仅在本地运行，不收集任何数据"
-    compliance: "符合 GDPR 和其他数据保护法规"
-  security:
-    vulnerabilities: "无已知漏洞"
-    best_practices: "不要在提交信息中包含敏感凭据"
-  dependencies:
-    - name: python
-      version: ">=3.6"
-    - name: git
-      version: ">=2.0"
-    - name: maven
-      version: ">=3.6"
-    - name: PyYAML
-      version: "*"
-    - name: Click
-      version: "*"
-  configuration:
-    - name: message
-      type: string
-      description: 提交信息（必填）
-      required: true
-      alias: "-m"
-    - name: branch
-      type: string
-      description: 目标分支（默认当前分支）
-      required: false
-      alias: "-b"
-    - name: skip-tests
-      type: boolean
-      description: 跳过单元测试
-      default: false
-    - name: skip-build
-      type: boolean
-      description: 跳过编译验证
-      default: false
-    - name: verbose
-      type: boolean
-      description: 输出详细日志
-      default: false
-  usage:
-    - step: "准备工作"
-      command: "确保项目已初始化 Git 仓库，且 Maven 环境可用"
-    - step: "执行提交"
-      command: "python git_commit.py -m \"提交说明\""
-    - step: "查看结果"
+description: Use this skill to automate Git commits with standardized messages, running tests and builds before committing. Trigger when the user wants to "commit code", "save changes", or "push updates".
+---
+
+# Git Commit Automation
+
+This skill enforces quality checks (Maven build, unit tests) and standardized commit messages before committing code to Git.
+
+## Usage
+
+### 1. Basic Commit
+
+Commits code with a message, automatically running tests and build first.
+
+```bash
+python git_commit.py -m "feat: Add financing order service"
+```
+
+### 2. Skip Checks (Emergency)
+
+Use for documentation updates or emergency fixes where build/test is not needed.
+
+```bash
+python git_commit.py -m "docs: Update README" --skip-build --skip-tests
+```
+
+### 3. Specify Branch
+
+Commit to a specific branch (if not current).
+
+```bash
+python git_commit.py -m "fix: Bug in calculation" --branch feature/calc-fix
+```
+
+## Commit Message Convention
+
+Follows the Conventional Commits specification:
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation only
+- `style:` Formatting, missing semi colons, etc; no code change
+- `refactor:` Refactoring production code
+- `test:` Adding tests, refactoring test; no production code change
+- `chore:` Updating build tasks, package manager configs, etc; no production code change
       command: "工具会自动执行测试、编译，成功后完成 Commit"
   limitations:
     - "仅支持 Maven 项目结构的自动构建与测试"
