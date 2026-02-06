@@ -17,7 +17,8 @@ Each skill is self-contained in its own folder with a `SKILL.md` file containing
 
 # Skill Sets
 - [./custom](./custom): Custom skills for SCF Loan Project (e.g. `db-generate`, `git-commit`)
-- [./vendor](./vendor): Vendor skills imported from open source projects (e.g. `skill-creator`, `mcp-builder`)
+- [./anthropics](./anthropics): Vendor skills imported from [anthropics/agent-skills](https://github.com/anthropics/agent-skills) (e.g. `skill-creator`, `mcp-builder`)
+- [./superpowers](./superpowers): Vendor skills imported from [obra/superpowers](https://github.com/obra/superpowers) (e.g. `brainstorming`, `systematic-debugging`)
 
 # Creating a Basic Skill
 
