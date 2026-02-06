@@ -95,6 +95,10 @@ class GitCommit:
                 continue
             if p.endswith('.class') or p.endswith('.jar') or p.endswith('.lst'):
                 continue
+            # 修复重命名文件的路径问题 (R  old -> new)
+            if '->' in p:
+                p = p.split('->')[-1].strip()
+                f['path'] = p
             filtered.append(f)
         return filtered
     
@@ -276,14 +280,32 @@ class GitCommit:
         changed_files = self.filter_changed_files(changed_files)
         if not changed_files:
             raise Exception("没有可提交的源码改动")
-        for f in changed_files:
-            path = f['path']
-            add_result = self.run_command(f'git add "{path}"')
-            if add_result.returncode != 0:
-                raise Exception(f"Git add 失败: {path}")
+        
+        # 批量 git add 避免文件路径过长问题或特殊字符问题
+        # 先尝试 git add -A (添加所有改动)
+        # 如果 self.project_dir 是 git 根目录，直接 add .
+        add_result = self.run_command('git add .')
+        if add_result.returncode != 0:
+            # 如果失败，尝试逐个添加 (作为降级方案)
+            print("git add . 失败，尝试逐个文件添加...")
+            for f in changed_files:
+                path = f['path']
+                add_result = self.run_command(f'git add "{path}"')
+                if add_result.returncode != 0:
+                    raise Exception(f"Git add 失败: {path}")
         
         # 执行提交
-        result = self.run_command(f"git commit -m \"{commit_message}\"")
+        # 使用文件传递 commit message 防止命令行过长或特殊字符问题
+        message_file = os.path.join(self.project_dir, ".git_commit_msg_tmp")
+        try:
+            with open(message_file, "w", encoding="utf-8") as f:
+                f.write(commit_message)
+            
+            result = self.run_command(f'git commit -F "{message_file}"')
+        finally:
+            if os.path.exists(message_file):
+                os.remove(message_file)
+
         if result.returncode != 0:
             raise Exception("Git commit 操作失败")
         
