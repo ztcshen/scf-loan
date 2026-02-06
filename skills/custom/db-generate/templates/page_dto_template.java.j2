@@ -8,13 +8,12 @@ package {{ package }};
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import java.io.Serializable;
 
 /**
  * {{ page_dto_name|replace('PageDTO', '') }}分页查询请求
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class {{ page_dto_name }} extends BasePageRequestDTO implements Serializable {
+public class {{ page_dto_name }} extends BasePageRequestDTO {
     private static final long serialVersionUID = 1L;
 }
