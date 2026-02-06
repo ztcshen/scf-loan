@@ -332,6 +332,31 @@ class DatabaseGenerator:
             column_comment = column["Comment"]
             java_type = self.get_java_type(column_type)
             
+            # Check if this field should reference an Enum
+            import sys
+            sys.path.append(os.path.join(os.path.dirname(__file__), "enum-gen"))
+            try:
+                from enum_gen import EnumGenerator
+                # Simple reuse of logic from EnumGenerator to detect enum candidates
+                # Note: This instantiates a new generator which is lightweight, but we just need the parsing logic
+                # For better performance, we could refactor parsing logic to a static utility
+                eg = EnumGenerator("dummy", "dummy", "dummy") 
+                items = eg.parse_enum_items(column_comment)
+                
+                if items:
+                    # Logic to determine enum name (same as in enum_gen.py)
+                    base_name = column_name
+                    if base_name.endswith("_status"): base_name = base_name[:-7]
+                    if base_name.endswith("_type"): base_name = base_name[:-5]
+                    parts = base_name.split("_")
+                    pascal_name = "".join(x.title() for x in parts)
+                    enum_name = f"{pascal_name}Enum"
+                    
+                    # Append @see to comment
+                    column_comment += f"\n     * @see {self.base_package}.common.enums.{enum_name}"
+            except Exception:
+                pass # Ignore errors during enum detection for DTO comments
+
             fields.append({
                 "column_name": column_name,
                 "field_name": field_name,
@@ -701,6 +726,25 @@ class DatabaseGenerator:
                 # 生成单元测试
                 if generate_tests:
                     self.generate_unit_test(entity_name, service_name)
+                    
+                # 集成 enum-gen: 自动生成枚举
+                try:
+                    print("Auto-generating Enums...")
+                    import sys
+                    sys.path.append(os.path.join(os.path.dirname(__file__), "enum-gen"))
+                    from enum_gen import EnumGenerator
+                    enum_gen = EnumGenerator(self.db_url, self.username, self.password, self.base_package, self.output_dir)
+                    # 如果是DDL模式，传入SQL内容
+                    if not self.db:
+                        enum_gen.generate(table_name, ddl_content=sql)
+                    else:
+                        enum_gen.generate(table_name)
+                except ImportError:
+                    print("Warning: enum-gen skill not found, skipping enum generation.")
+                except Exception as e:
+                    print(f"Warning: Failed to generate enums: {e}")
+                    import traceback
+                    traceback.print_exc()
                 
                 # 收集生成的文件
                 generated_files = [
@@ -745,6 +789,34 @@ class DatabaseGenerator:
                     if generate_tests:
                         self.generate_unit_test(entity_name, service_name)
                     
+                    # 集成 enum-gen: 自动生成枚举
+                    try:
+                        print("Auto-generating Enums...")
+                        import sys
+                        # Fix path to point to current_dir/enum-gen
+                        enum_gen_path = os.path.join(os.path.dirname(__file__), "enum-gen")
+                        if enum_gen_path not in sys.path:
+                            sys.path.append(enum_gen_path)
+                        from enum_gen import EnumGenerator
+                        enum_gen = EnumGenerator(self.db_url, self.username, self.password, self.base_package, self.output_dir)
+                        # 如果是DDL模式，传入SQL内容
+                        # 注意：在异常处理块中，self.db 连接可能失败也可能成功（如果是其他异常）
+                        # 但如果我们在 'Database connection failed' 分支进来，说明 self.db 很可能是 None
+                        # 或者连接无效。所以我们优先使用 DDL 内容。
+                        print(f"DEBUG: Checking self.db status: {self.db}")
+                        
+                        if not self.db:
+                            print("DEBUG: self.db is None, using DDL content")
+                            enum_gen.generate(table_name, ddl_content=sql)
+                        else:
+                            # 即使连接对象存在，也可能连接断开了，这里为了保险起见，如果 sql 变量存在，优先用 DDL
+                            print("DEBUG: self.db is connected, but forcing DDL usage for robustness in fallback mode")
+                            enum_gen.generate(table_name, ddl_content=sql)
+                    except ImportError:
+                        print("Warning: enum-gen skill not found, skipping enum generation.")
+                    except Exception as e:
+                        print(f"Warning: Failed to generate enums: {e}")
+
                     # 收集生成的文件
                     generated_files = [
                         os.path.join(self.output_dir, "scf-loan-dal", "src", "main", "java", *self.base_package.split("."), "dal", "entity", f"{entity_name}.java"),
@@ -823,6 +895,24 @@ class DatabaseGenerator:
                     if generate_tests:
                         self.generate_unit_test(entity_name, service_name)
                     
+                    # 集成 enum-gen: 自动生成枚举
+                    try:
+                        print("Auto-generating Enums...")
+                        import sys
+                        # Fix path to point to current_dir/enum-gen
+                        enum_gen_path = os.path.join(os.path.dirname(__file__), "enum-gen")
+                        if enum_gen_path not in sys.path:
+                            sys.path.append(enum_gen_path)
+                        from enum_gen import EnumGenerator
+                        enum_gen = EnumGenerator(self.db_url, self.username, self.password, self.base_package, self.output_dir)
+                        # We are in fallback mode with SQL available, so force DDL usage
+                        print("DEBUG: Fallback mode active, forcing DDL usage for enum generation")
+                        enum_gen.generate(table_name, ddl_content=sql)
+                    except ImportError:
+                        print("Warning: enum-gen skill not found, skipping enum generation.")
+                    except Exception as e:
+                        print(f"Warning: Failed to generate enums: {e}")
+
                     # 收集生成的文件
                     generated_files = [
                         os.path.join(self.output_dir, "scf-loan-dal", "src", "main", "java", *self.base_package.split("."), "dal", "entity", f"{entity_name}.java"),

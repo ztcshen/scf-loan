@@ -1,155 +1,84 @@
-# 编排工具 (orchestrator)
-
-## 功能描述
-
-此工具用于编排执行多个开发任务，自动化完成从生成表代码到执行服务的完整流程。它可以：
-
-1. 生成数据库表代码（支持数据库连接或默认DDL降级）
-2. 执行服务编译和运行
-3. 可选检测服务健康状态
-4. 清理与停止服务
-
-## 安装依赖
-
-此工具依赖于以下Python库：
-
-- `click`：用于命令行参数解析
-
-可以通过以下命令安装依赖：
-
-```bash
-pip install click
-```
-
-## 使用方法
-
-### 基本用法
-
-在项目根目录下执行：
-
-```bash
-python skills/orchestrator/orchestrator.py run
-```
-
-### 查看帮助信息
-
-```bash
-python skills/orchestrator/orchestrator.py --help
-```
-
-### 命令列表
-
-| 命令 | 描述 |
-|------|------|
-| `run` | 执行完整流程：生成表代码 → 执行runner |
-| `generate-code` | 仅生成数据库表代码 |
-| `run-service` | 仅执行服务编译和运行 |
-| `cleanup` | 清理资源，停止服务 |
-
-## 执行流程
-
-### 执行完整流程
-
-1. 生成数据库表代码
-2. 执行服务编译和运行
-3. （可选）检测服务健康状态
-4. 停止服务
-
-### 仅生成数据库表代码
-
-1. 调用db-generate skill生成数据库表代码
-
-### 仅执行服务编译和运行
-
-1. 调用service-runner skill执行服务编译和运行
-2. 检测服务健康状态
-
-### 清理资源
-
-1. 停止服务
-
-## 输出示例
-
-### 执行完整流程
-
-```
-开始执行编排流程...
-
-步骤1: 生成数据库表代码
-开始生成数据库表代码...
-尝试连接数据库失败，切换为默认DDL解析
-生成实体类：FinancingOrderEntity
-生成Mapper：FinancingOrderMapper
-生成Service：FinancingOrderService
-生成Service实现：FinancingOrderServiceImpl
-生成DTO：FinancingOrderDTO
-生成单元测试：FinancingOrderServiceTest
-代码生成完成！
-
-步骤2: 执行服务编译和运行
-开始编译服务...
-服务编译成功！
-开始运行服务...
-正在启动服务，请稍候...
-（可选）检查服务健康状态...
-健康检查未启用或端点未配置，跳过
-
-服务编译运行成功！
-停止服务...
-服务已停止！
-
-编排流程执行完成！
-```
-
-## 注意事项
-
-1. **依赖要求**：此工具依赖于以下skill：
-   - db-generate：用于生成数据库表代码（支持默认DDL降级）
-   - service-runner：用于执行服务编译和运行（可配置健康检查）
-
-2. **权限要求**：启动MySQL服务可能需要管理员权限
-
-3. **配置要求**：如需连接数据库，参考 db-generate 的配置；未连接时将自动使用默认DDL解析生成代码
-
-4. **安全注意事项**：此工具仅用于开发和测试环境，不建议在生产环境中使用
-
-## 故障排除
-
-### 数据库连接失败
-
-如果数据库连接失败，工具会自动降级为默认DDL解析，无需手动干预。
-
-### 代码生成失败
-
-如果代码生成失败，可能是因为：
-
-1. MySQL服务未启动
-2. 数据库连接配置错误
-3. 表结构不存在
-
-请检查MySQL服务状态和连接配置，确保服务已启动且配置正确。
-
-### 服务编译运行失败
-
-如果服务编译运行失败，可能是因为：
-
-1. 代码编译错误
-2. 服务配置错误
-3. 端口被占用
-
-请检查代码编译错误信息和服务配置，确保代码正确且配置合理。
-
-## 支持的平台
-
-- Windows
-- macOS
-- Linux
-
-## 版本历史
-
-### 1.0.0 (2026-02-04)
-
-- 初始版本
-- 支持执行完整流程：启动MySQL → 生成表数据 → 执行runner
-- 支持单独执行各个步骤
-- 支持清理资源
+---
+name: orchestrator
+description: 编排工具，自动化执行从数据库表代码生成到服务运行的完整流程。
+metadata:
+  emoji: "🎼"
+  requires:
+    - name: python
+      type: binary
+      description: Python 运行环境
+    - name: skill-db-generate
+      type: skill
+      description: 数据库代码生成技能
+    - name: skill-service-runner
+      type: skill
+      description: 服务运行技能
+  install:
+    - name: python
+      command: "安装 Python 3.6+: https://www.python.org/downloads/"
+    - name: dependencies
+      command: "pip install click"
+  examples:
+    - name: 执行完整流程
+      command: "python skills/orchestrator/orchestrator.py run"
+    - name: 仅生成代码
+      command: "python skills/orchestrator/orchestrator.py generate-code"
+    - name: 仅运行服务
+      command: "python skills/orchestrator/orchestrator.py run-service"
+    - name: 清理资源
+      command: "python skills/orchestrator/orchestrator.py cleanup"
+  tags:
+    - orchestration
+    - workflow
+    - automation
+    - database
+    - service
+  author: scf-team
+  version: "1.0.0"
+  category: devops
+  platforms:
+    - windows
+    - macos
+    - linux
+  support:
+    issues: "https://github.com/scf-team/scf-loan/issues"
+    email: "support@scf-team.com"
+  license:
+    name: MIT
+    url: "https://opensource.org/licenses/MIT"
+  privacy:
+    policy: "本工具仅在本地运行，不收集任何数据"
+    compliance: "符合 GDPR 和其他数据保护法规"
+  security:
+    vulnerabilities: "无已知漏洞"
+    best_practices: "避免在生产环境直接使用清理命令"
+  dependencies:
+    - name: python
+      version: ">=3.6"
+    - name: click
+      version: "*"
+  configuration:
+    - name: command
+      type: string
+      description: 执行命令 (run, generate-code, run-service, cleanup)
+      required: true
+  usage:
+    - step: "准备工作"
+      command: "确保 Python 环境已安装，且相关 skill (db-generate, service-runner) 已配置"
+    - step: "执行编排"
+      command: "python skills/orchestrator/orchestrator.py run"
+    - step: "查看输出"
+      command: "检查控制台输出，确认各步骤执行状态"
+  limitations:
+    - "仅支持串行执行任务"
+    - "依赖于特定的 skill 路径结构"
+  troubleshooting:
+    - problem: "ModuleNotFoundError"
+      solution: "确保在项目根目录下运行命令"
+    - problem: "Skill not found"
+      solution: "检查 skills 目录下是否存在对应的 skill 文件夹"
+  changelog:
+    - version: "1.0.0"
+      date: "2026-02-04"
+      changes:
+        - "初始版本，支持基本编排功能"

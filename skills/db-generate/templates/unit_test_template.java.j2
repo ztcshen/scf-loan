@@ -113,17 +113,11 @@ public class {{ test_name }} {
         mockResult.setPage(1);
         mockResult.setSize(10);
         when({{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(dto)).thenReturn(mockResult);
-        when({{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(dto)).thenReturn(mockResult);
+        
+        PageResult<{{ entity_name|replace('Entity','DTO') }}> pageResult = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(dto);
+        
         assertNotNull(pageResult);
         verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page{{ entity_name|replace('Entity', '') }}(dto);
-        PageResult<{{ entity_name|replace('Entity','DTO') }}> pageResult = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(dto);
-        logger.info("测试分页查询{{ entity_name|replace('Entity', '') }}执行完成");
-    }
-}
-        
-        // 验证方法调用
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page{{ entity_name|replace('Entity', '') }}(dto);
-        
         logger.info("测试分页查询{{ entity_name|replace('Entity', '') }}执行完成");
     }
 }
