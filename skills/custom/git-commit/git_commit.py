@@ -116,6 +116,49 @@ class GitCommit:
             raise Exception("单元测试失败，请修复测试后再提交")
         
         print("单元测试通过")
+
+        # 检查JaCoCo覆盖率
+        self.check_coverage()
+
+    def check_coverage(self):
+        """检查覆盖率"""
+        print("检查JaCoCo分支覆盖率...")
+        
+        # 查找所有jacoco.csv文件
+        import glob
+        import csv
+        
+        report_files = glob.glob(os.path.join(self.project_dir, "**/target/site/jacoco/jacoco.csv"), recursive=True)
+        if not report_files:
+            print("警告: 未找到JaCoCo覆盖率报告，跳过覆盖率检查")
+            return
+            
+        all_passed = True
+        for report_file in report_files:
+            module_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(report_file)))))
+            print(f"检查模块: {module_name}")
+            
+            with open(report_file, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    missed = int(row['BRANCH_MISSED'])
+                    covered = int(row['BRANCH_COVERED'])
+                    total = missed + covered
+                    
+                    if total > 0:
+                        coverage = (covered / total) * 100
+                        if coverage < 100:
+                            print(f"  [失败] 类 {row['CLASS']} 分支覆盖率不足: {coverage:.2f}% (要求 100%)")
+                            all_passed = False
+                        else:
+                            if self.verbose:
+                                print(f"  [通过] 类 {row['CLASS']} 分支覆盖率: 100%")
+        
+        if not all_passed:
+            raise Exception("分支覆盖率未达到 100%，禁止提交！")
+        
+        print("分支覆盖率检查通过 (100%)")
+
     
     def build_project(self):
         """编译项目"""
