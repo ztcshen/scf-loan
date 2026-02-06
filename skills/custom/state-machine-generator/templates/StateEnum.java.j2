@@ -1,0 +1,10 @@
+package {{ package }};
+
+/**
+ * States for {{ name }}
+ */
+public enum {{ name }}State {
+{% for state in states %}
+    {{ state }}{% if not loop.last %},{% else %};{% endif %}
+{% endfor %}
+}

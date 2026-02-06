@@ -1,0 +1,10 @@
+package {{ package }};
+
+/**
+ * Events for {{ name }}
+ */
+public enum {{ name }}Event {
+{% for event in events %}
+    {{ event }}{% if not loop.last %},{% else %};{% endif %}
+{% endfor %}
+}
