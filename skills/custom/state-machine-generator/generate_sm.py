@@ -11,7 +11,9 @@ from jinja2 import Environment, FileSystemLoader
 def generate(name, package, states, events, output):
     """Generates Java State Machine code."""
     
-    env = Environment(loader=FileSystemLoader('skills/custom/state-machine-generator/templates'))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    template_dir = os.path.join(script_dir, 'templates')
+    env = Environment(loader=FileSystemLoader(template_dir))
     
     state_list = [s.strip() for s in states.split(',')]
     event_list = [e.strip() for e in events.split(',')]
