@@ -281,7 +281,7 @@ These techniques are part of systematic debugging and available in this director
 
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
 - **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
-- **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+- **Condition-based waiting**: Don't use `sleep(1000)`. Wait for specific events or states. See `ConditionBasedWaitingExample.java` for Java implementation.
 
 **Related skills:**
 - **superpowers:test-driven-development** - For creating failing test case (Phase 4, Step 1)
