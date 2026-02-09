@@ -203,6 +203,9 @@ class FieldManager:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.writelines(new_lines)
             print(f"Removed field {field_name} from {os.path.basename(file_path)}")
+            # TODO: We might want to remove unused imports here if we were being thorough,
+            # but that requires parsing the whole file to check usage.
+            # For now, leaving the import is safe (just a warning in IDE).
         else:
             print(f"Field {field_name} not found in {os.path.basename(file_path)}")
 
