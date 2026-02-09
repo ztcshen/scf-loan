@@ -43,6 +43,7 @@ public final class FinancingOrderConverter {
         d.setRevision(e.getRevision());
         d.setStartDate(e.getStartDate());
         d.setDueDate(e.getDueDate());
+
         return d;
     }
 
@@ -73,6 +74,7 @@ public final class FinancingOrderConverter {
         e.setRevision(d.getRevision());
         e.setStartDate(d.getStartDate());
         e.setDueDate(d.getDueDate());
+
         return e;
     }
 }

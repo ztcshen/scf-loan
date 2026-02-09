@@ -13,6 +13,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
 /**
  * 融资订单表
