@@ -1,3 +1,8 @@
+---
+name: db-field-manager
+description: Manage database fields in generated Java code incrementally. Use when adding/removing fields to tables without regenerating entire files.
+---
+
 # Database Field Manager Skill
 
 This skill allows incremental updates to the codebase when database fields are added or removed, preserving manual changes in the files.
@@ -16,7 +21,7 @@ Adds a new field to the Entity, DTO, and Converter classes.
 
 **Example:**
 ```bash
-db-add-field --table t_scf_financing_order --field risk_score --type decimal --comment "风控评分"
+python skills/custom/db-field-manager/scripts/db_field_manager.py add --table t_scf_financing_order --field risk_score --type decimal --comment "风控评分"
 ```
 
 ### `db-remove-field`
@@ -29,7 +34,7 @@ Removes a field from the Entity, DTO, and Converter classes.
 
 **Example:**
 ```bash
-db-remove-field --table t_scf_financing_order --field risk_score
+python skills/custom/db-field-manager/scripts/db_field_manager.py remove --table t_scf_financing_order --field risk_score
 ```
 
 ## Supported Files
@@ -40,3 +45,4 @@ db-remove-field --table t_scf_financing_order --field risk_score
 ## Notes
 - Does not modify Mapper or Service files as they usually don't require changes for simple field additions.
 - Automatically handles basic Java imports (e.g., `BigDecimal`, `LocalDateTime`).
+- Generated SQL ALTER files are saved in `skills/custom/db-field-manager/scripts/sql/`.
