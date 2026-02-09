@@ -322,6 +322,9 @@ class DatabaseGenerator:
         # We want 'id' in the response DTO, so we don't exclude it.
         base_dto_fields = {"page", "size", "startTime", "endTime"}
         
+        # 导入 BasePageRequestDTO
+        # import_base = f"{self.base_package}.common.base.dto.BasePageRequestDTO"
+        
         for column in table_schema["columns"]:
             column_name = column["Field"]
             field_name = self.camel_case(column_name)

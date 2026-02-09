@@ -8,7 +8,7 @@ package com.scf.loan.biz.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
  import com.scf.loan.dal.entity.BillEntity;
- import com.scf.loan.common.dto.PageResult;
+ import com.scf.loan.common.base.dto.PageResult;
  import com.scf.loan.common.dto.BillPageDTO;
  import com.scf.loan.common.dto.BillDTO;
 

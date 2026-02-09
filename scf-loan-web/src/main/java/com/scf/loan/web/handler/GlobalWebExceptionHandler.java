@@ -1,9 +1,9 @@
 package com.scf.loan.web.handler;
 
-import com.scf.loan.common.dto.ResponseDTO;
-import com.scf.loan.common.enums.ResultCodeEnum;
-import com.scf.loan.common.exception.ServiceException;
-import com.scf.loan.common.exception.ValidateException;
+import com.scf.loan.common.base.dto.ResponseDTO;
+import com.scf.loan.common.base.enums.ResultCodeEnum;
+import com.scf.loan.common.base.exception.ServiceException;
+import com.scf.loan.common.base.exception.ValidateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -6,6 +6,7 @@
  */
 package com.scf.loan.common.dto;
 
+import com.scf.loan.common.base.dto.BasePageRequestDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

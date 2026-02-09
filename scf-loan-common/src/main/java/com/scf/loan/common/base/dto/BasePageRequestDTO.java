@@ -1,4 +1,4 @@
-package com.scf.loan.common.dto;
+package com.scf.loan.common.base.dto;
 
 import lombok.Data;
 import java.time.LocalDateTime;

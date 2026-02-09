@@ -8,17 +8,18 @@ package com.scf.loan.biz.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.scf.loan.common.dto.PageResult;
+import com.scf.loan.common.base.dto.PageResult;
 import com.scf.loan.dal.entity.FinancingOrderEntity;
 import com.scf.loan.dal.mapper.FinancingOrderMapper;
 import com.scf.loan.common.dto.FinancingOrderPageDTO;
 import com.scf.loan.common.dto.FinancingOrderDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +35,21 @@ import static org.mockito.Mockito.*;
 /**
  * FinancingOrderService单元测试
  */
+@ExtendWith(MockitoExtension.class)
 public class FinancingOrderServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(FinancingOrderServiceTest.class);
 
     @InjectMocks
     @Spy
-    private FinancingOrderServiceImpl financingorderService;
+    private FinancingOrderServiceImpl financingOrderService;
 
     @Mock
-    private FinancingOrderMapper financingorderMapper;
+    private FinancingOrderMapper financingOrderMapper;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // MockitoAnnotations.openMocks(this); // Not needed with @ExtendWith(MockitoExtension.class)
     }
 
     /**
@@ -63,12 +65,12 @@ public class FinancingOrderServiceTest {
         entities.add(entity);
 
         // 模拟 saveBatch 返回 true
-        doReturn(true).when(financingorderService).saveBatch(entities);
+        doReturn(true).when(financingOrderService).saveBatch(entities);
 
-        boolean result = financingorderService.batchCreateFinancingOrder(entities);
+        boolean result = financingOrderService.batchCreateFinancingOrder(entities);
         assertTrue(result);
         
-        verify(financingorderService, times(1)).saveBatch(entities);
+        verify(financingOrderService, times(1)).saveBatch(entities);
         
         logger.info("测试批量创建FinancingOrder执行完成");
     }
@@ -86,12 +88,12 @@ public class FinancingOrderServiceTest {
         entities.add(entity);
 
         // 模拟 updateBatchById 返回 true
-        doReturn(true).when(financingorderService).updateBatchById(entities);
+        doReturn(true).when(financingOrderService).updateBatchById(entities);
 
-        boolean result = financingorderService.batchUpdateFinancingOrder(entities);
+        boolean result = financingOrderService.batchUpdateFinancingOrder(entities);
         assertTrue(result);
         
-        verify(financingorderService, times(1)).updateBatchById(entities);
+        verify(financingOrderService, times(1)).updateBatchById(entities);
         
         logger.info("测试批量更新FinancingOrder执行完成");
     }
@@ -120,16 +122,16 @@ public class FinancingOrderServiceTest {
         page.setTotal(1);
 
         // 模拟 page 方法
-        doReturn(page).when(financingorderService).page(any(Page.class), any(QueryWrapper.class));
+        doReturn(page).when(financingOrderService).page(any(Page.class), any(QueryWrapper.class));
 
-        PageResult<FinancingOrderDTO> result = financingorderService.pageFinancingOrder(pageDTO);
+        PageResult<FinancingOrderDTO> result = financingOrderService.pageFinancingOrder(pageDTO);
         
         assertNotNull(result);
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getRecords().size());
         assertEquals(1L, result.getRecords().get(0).getId());
 
-        verify(financingorderService, times(1)).page(any(Page.class), any(QueryWrapper.class));
+        verify(financingOrderService, times(1)).page(any(Page.class), any(QueryWrapper.class));
 
         logger.info("测试分页查询FinancingOrder执行完成");
     }
@@ -156,15 +158,15 @@ public class FinancingOrderServiceTest {
         page.setTotal(1);
 
         // 模拟 page 方法
-        doReturn(page).when(financingorderService).page(any(Page.class), any(QueryWrapper.class));
+        doReturn(page).when(financingOrderService).page(any(Page.class), any(QueryWrapper.class));
 
-        PageResult<FinancingOrderDTO> result = financingorderService.pageFinancingOrder(pageDTO);
+        PageResult<FinancingOrderDTO> result = financingOrderService.pageFinancingOrder(pageDTO);
         
         assertNotNull(result);
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getRecords().size());
 
-        verify(financingorderService, times(1)).page(any(Page.class), any(QueryWrapper.class));
+        verify(financingOrderService, times(1)).page(any(Page.class), any(QueryWrapper.class));
 
         logger.info("测试分页查询FinancingOrder - 空条件 执行完成");
     }

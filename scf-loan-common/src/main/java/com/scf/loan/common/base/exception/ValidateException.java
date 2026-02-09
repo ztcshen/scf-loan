@@ -1,4 +1,6 @@
-package com.scf.loan.common.exception;
+package com.scf.loan.common.base.exception;
+
+import com.scf.loan.common.base.enums.ResultCodeEnum;
 
 /**
  * 参数校验异常

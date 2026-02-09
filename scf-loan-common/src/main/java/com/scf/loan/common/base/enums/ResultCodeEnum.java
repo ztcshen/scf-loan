@@ -1,4 +1,4 @@
-package com.scf.loan.common.enums;
+package com.scf.loan.common.base.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

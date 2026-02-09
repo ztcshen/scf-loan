@@ -1,6 +1,6 @@
-package com.scf.loan.common.dto;
+package com.scf.loan.common.base.dto;
 
-import com.scf.loan.common.enums.ResultCodeEnum;
+import com.scf.loan.common.base.enums.ResultCodeEnum;
 import lombok.Data;
 
 import java.io.Serializable;

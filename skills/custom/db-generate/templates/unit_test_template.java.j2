@@ -8,17 +8,18 @@ package {{ package }};
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.scf.loan.common.dto.PageResult;
+import com.scf.loan.common.base.dto.PageResult;
 import {{ entity_package }}.{{ entity_name }};
 import {{ mapper_package }}.{{ mapper_name }};
 import {{ package|replace('.biz.service.impl','') }}.common.dto.{{ entity_name|replace('Entity','PageDTO') }};
 import {{ package|replace('.biz.service.impl','') }}.common.dto.{{ entity_name|replace('Entity','DTO') }};
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +35,21 @@ import static org.mockito.Mockito.*;
 /**
  * {{ service_name }}单元测试
  */
+@ExtendWith(MockitoExtension.class)
 public class {{ test_name }} {
 
     private static final Logger logger = LoggerFactory.getLogger({{ test_name }}.class);
 
     @InjectMocks
     @Spy
-    private {{ service_impl_name }} {{ service_name|lower|replace('service', '') }}Service;
+    private {{ service_impl_name }} {{ service_name[0]|lower }}{{ service_name[1:] }};
 
     @Mock
-    private {{ mapper_name }} {{ mapper_name|lower|replace('mapper', '') }}Mapper;
+    private {{ mapper_name }} {{ mapper_name[0]|lower }}{{ mapper_name[1:] }};
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // MockitoAnnotations.openMocks(this); // Not needed with @ExtendWith(MockitoExtension.class)
     }
 
     /**
@@ -63,12 +65,12 @@ public class {{ test_name }} {
         entities.add(entity);
 
         // 模拟 saveBatch 返回 true
-        doReturn(true).when({{ service_name|lower|replace('service', '') }}Service).saveBatch(entities);
+        doReturn(true).when({{ service_name[0]|lower }}{{ service_name[1:] }}).saveBatch(entities);
 
-        boolean result = {{ service_name|lower|replace('service', '') }}Service.batchCreate{{ entity_name|replace('Entity', '') }}(entities);
+        boolean result = {{ service_name[0]|lower }}{{ service_name[1:] }}.batchCreate{{ entity_name|replace('Entity', '') }}(entities);
         assertTrue(result);
         
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).saveBatch(entities);
+        verify({{ service_name[0]|lower }}{{ service_name[1:] }}, times(1)).saveBatch(entities);
         
         logger.info("测试批量创建{{ entity_name|replace('Entity', '') }}执行完成");
     }
@@ -86,12 +88,12 @@ public class {{ test_name }} {
         entities.add(entity);
 
         // 模拟 updateBatchById 返回 true
-        doReturn(true).when({{ service_name|lower|replace('service', '') }}Service).updateBatchById(entities);
+        doReturn(true).when({{ service_name[0]|lower }}{{ service_name[1:] }}).updateBatchById(entities);
 
-        boolean result = {{ service_name|lower|replace('service', '') }}Service.batchUpdate{{ entity_name|replace('Entity', '') }}(entities);
+        boolean result = {{ service_name[0]|lower }}{{ service_name[1:] }}.batchUpdate{{ entity_name|replace('Entity', '') }}(entities);
         assertTrue(result);
         
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).updateBatchById(entities);
+        verify({{ service_name[0]|lower }}{{ service_name[1:] }}, times(1)).updateBatchById(entities);
         
         logger.info("测试批量更新{{ entity_name|replace('Entity', '') }}执行完成");
     }
@@ -120,16 +122,16 @@ public class {{ test_name }} {
         page.setTotal(1);
 
         // 模拟 page 方法
-        doReturn(page).when({{ service_name|lower|replace('service', '') }}Service).page(any(Page.class), any(QueryWrapper.class));
+        doReturn(page).when({{ service_name[0]|lower }}{{ service_name[1:] }}).page(any(Page.class), any(QueryWrapper.class));
 
-        PageResult<{{ entity_name|replace('Entity','DTO') }}> result = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(pageDTO);
+        PageResult<{{ entity_name|replace('Entity','DTO') }}> result = {{ service_name[0]|lower }}{{ service_name[1:] }}.page{{ entity_name|replace('Entity', '') }}(pageDTO);
         
         assertNotNull(result);
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getRecords().size());
         assertEquals(1L, result.getRecords().get(0).getId());
 
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page(any(Page.class), any(QueryWrapper.class));
+        verify({{ service_name[0]|lower }}{{ service_name[1:] }}, times(1)).page(any(Page.class), any(QueryWrapper.class));
 
         logger.info("测试分页查询{{ entity_name|replace('Entity', '') }}执行完成");
     }
@@ -156,15 +158,15 @@ public class {{ test_name }} {
         page.setTotal(1);
 
         // 模拟 page 方法
-        doReturn(page).when({{ service_name|lower|replace('service', '') }}Service).page(any(Page.class), any(QueryWrapper.class));
+        doReturn(page).when({{ service_name[0]|lower }}{{ service_name[1:] }}).page(any(Page.class), any(QueryWrapper.class));
 
-        PageResult<{{ entity_name|replace('Entity','DTO') }}> result = {{ service_name|lower|replace('service', '') }}Service.page{{ entity_name|replace('Entity', '') }}(pageDTO);
+        PageResult<{{ entity_name|replace('Entity','DTO') }}> result = {{ service_name[0]|lower }}{{ service_name[1:] }}.page{{ entity_name|replace('Entity', '') }}(pageDTO);
         
         assertNotNull(result);
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getRecords().size());
 
-        verify({{ service_name|lower|replace('service', '') }}Service, times(1)).page(any(Page.class), any(QueryWrapper.class));
+        verify({{ service_name[0]|lower }}{{ service_name[1:] }}, times(1)).page(any(Page.class), any(QueryWrapper.class));
 
         logger.info("测试分页查询{{ entity_name|replace('Entity', '') }} - 空条件 执行完成");
     }

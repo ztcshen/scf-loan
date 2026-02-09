@@ -8,6 +8,7 @@ package {{ package }};
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import com.scf.loan.common.base.dto.BasePageRequestDTO;
 
 {% if 'LocalDateTime' in fields|map(attribute='java_type') %}
 import java.time.LocalDateTime;

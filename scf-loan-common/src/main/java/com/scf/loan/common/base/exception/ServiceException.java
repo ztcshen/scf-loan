@@ -1,6 +1,6 @@
-package com.scf.loan.common.exception;
+package com.scf.loan.common.base.exception;
 
-import com.scf.loan.common.enums.ResultCodeEnum;
+import com.scf.loan.common.base.enums.ResultCodeEnum;
 import lombok.Getter;
 
 /**

@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scf.loan.biz.service.BillService;
 import com.scf.loan.dal.entity.BillEntity;
 import com.scf.loan.dal.mapper.BillMapper;
-import com.scf.loan.common.dto.PageResult;
+import com.scf.loan.common.base.dto.PageResult;
 import com.scf.loan.common.dto.BillPageDTO;
 import com.scf.loan.common.dto.BillDTO;
 import com.scf.loan.biz.convert.BillConverter;

@@ -1,7 +1,7 @@
 package com.scf.loan.web.handler;
 
-import com.scf.loan.common.exception.ServiceException;
-import com.scf.loan.common.exception.ValidateException;
+import com.scf.loan.common.base.exception.ServiceException;
+import com.scf.loan.common.base.exception.ValidateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
