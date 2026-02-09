@@ -8,6 +8,7 @@ Manage fields in generated Java code without overwriting files.
 import os
 import re
 import click
+from datetime import datetime
 
 class FieldManager:
     def __init__(self, base_package="com.scf.loan", project_root="."):
@@ -280,7 +281,30 @@ class FieldManager:
             f.writelines(new_lines)
         print(f"Updated Converter {os.path.basename(file_path)} (removed mapping)")
 
+    def generate_alter_sql(self, table, field, mysql_type, comment):
+        """生成ALTER TABLE语句并保存"""
+        comment_sql = f" COMMENT '{comment}'" if comment else ""
+        sql = f"ALTER TABLE `{table}` ADD COLUMN `{field}` {mysql_type}{comment_sql};\n"
+        
+        # Ensure sql directory exists
+        sql_dir = os.path.join(os.path.dirname(__file__), "sql")
+        os.makedirs(sql_dir, exist_ok=True)
+        
+        # Save to file
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        filename = f"{timestamp}_alter_{table}_add_{field}.sql"
+        file_path = os.path.join(sql_dir, filename)
+        
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(sql)
+            
+        print(f"Generated SQL: {file_path}")
+        return file_path
+
     def process_add(self, table, field, mysql_type, comment):
+        # 0. Generate SQL
+        self.generate_alter_sql(table, field, mysql_type, comment)
+
         entity_name = self.pascal_case(table)
         if entity_name.endswith("Entity"): entity_name = entity_name[:-6]
         entity_name += "Entity"
