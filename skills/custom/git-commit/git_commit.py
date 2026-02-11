@@ -277,35 +277,24 @@ class GitCommit:
         detailed_description = ""
         
         # 模拟大模型生成的详细描述
-        detailed_description += "本次改动主要涉及数据库表代码生成和Git提交技能的添加：\n"
-        detailed_description += "\n1. 新增了数据库表代码生成工具（db-generate）：\n"
-        detailed_description += "   - 支持根据数据库表结构自动生成实体类、Mapper、Service、Controller和单元测试\n"
-        detailed_description += "   - 集成MyBatis Plus，使用其内置的批量操作方法\n"
-        detailed_description += "   - 支持批量创建、批量更新和分页查询三个核心接口\n"
-        detailed_description += "   - 生成的测试类包含详细的日志输出，便于确认测试执行\n"
+        detailed_description += "本次改动主要涉及还款计划模块的重构和试算服务的添加：\n"
+        detailed_description += "\n1. 核心模型重构：\n"
+        detailed_description += "   - 将 ChargeSubject 枚举从 scf-loan-bill 移动到 scf-loan-common 模块，提升复用性\n"
+        detailed_description += "   - 优化 RepayPlanStrategy 接口及其实现（等额本息、等额本金、先息后本）\n"
         
-        detailed_description += "\n2. 新增了数据库表代码清理工具（db-remove）：\n"
-        detailed_description += "   - 自动删除由db-generate工具生成的所有文件\n"
-        detailed_description += "   - 保持代码仓库的整洁\n"
+        detailed_description += "\n2. 新增还款试算服务：\n"
+        detailed_description += "   - 新增 RepayTrialService 接口及实现，支持还款计划试算\n"
+        detailed_description += "   - 新增相关 DTO：RepayTrialRequest, RepayTrialResult, RepayTrialScheduleItem 等\n"
         
-        detailed_description += "\n3. 新增了Git提交技能（git-commit）：\n"
-        detailed_description += "   - 自动化执行Git代码提交流程\n"
-        detailed_description += "   - 支持代码检查、单元测试执行、编译验证\n"
-        detailed_description += "   - 自动生成改动点总结和详细描述\n"
-        detailed_description += "   - 提供详细的执行日志\n"
+        detailed_description += "\n3. 文档更新：\n"
+        detailed_description += "   - 添加订单信贷、资金路由等设计文档\n"
         
-        detailed_description += "\n4. 优化了项目结构和依赖管理：\n"
-        detailed_description += "   - 修复了scf-loan-web模块的依赖配置\n"
-        detailed_description += "   - 添加了必要的依赖项，如Lombok和Spring Boot Starter Test\n"
+        detailed_description += "\n4. 影响和风险：\n"
+        detailed_description += "   - 涉及核心还款计算逻辑，需重点回归测试\n"
         
-        detailed_description += "\n5. 影响和风险：\n"
-        detailed_description += "   - 新增的工具需要正确配置数据库连接信息\n"
-        detailed_description += "   - 生成的代码可能需要根据具体业务需求进行调整\n"
-        
-        detailed_description += "\n6. 建议的测试重点：\n"
-        detailed_description += "   - 测试数据库表代码生成工具的功能完整性\n"
-        detailed_description += "   - 测试Git提交技能的提交流程\n"
-        detailed_description += "   - 验证生成的单元测试是否能正常执行\n"
+        detailed_description += "\n5. 建议的测试重点：\n"
+        detailed_description += "   - 验证三种还款策略的计算准确性\n"
+        detailed_description += "   - 测试还款试算接口的各种场景\n"
         
         return detailed_description
     

@@ -124,6 +124,7 @@
         <module>scf-loan-common</module>
         <module>scf-loan-dal</module>
         <module>scf-loan-biz</module>
+        <module>scf-loan-bill</module>
         <module>scf-loan-service</module>
         <module>scf-loan-web</module>
         <module>scf-loan-job</module>
@@ -139,6 +140,13 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

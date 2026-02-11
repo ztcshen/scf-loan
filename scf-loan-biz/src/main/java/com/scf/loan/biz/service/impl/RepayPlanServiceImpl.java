@@ -1,43 +1,37 @@
-package com.scf.loan.bill.plan.strategy;
+package com.scf.loan.biz.service.impl;
 
-import com.scf.loan.bill.plan.enums.RepayMethod;
-import com.scf.loan.bill.plan.RepayPlanRequest;
-import com.scf.loan.bill.plan.RepayPlanStrategy;
-import com.scf.loan.bill.plan.RepayPlanStrategyKey;
+import com.scf.loan.biz.service.RepayPlanService;
 import com.scf.loan.common.dto.RepayPlanItem;
 import com.scf.loan.common.dto.RepayPlanSubjectDetail;
 import com.scf.loan.common.enums.ChargeSubject;
 import com.scf.loan.common.utils.scf.ScfInterestUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class InterestFirstPrincipalLastStrategy extends BaseRepayPlanStrategy implements RepayPlanStrategy {
-    @Override
-    public RepayPlanStrategyKey key() {
-        RepayPlanStrategyKey key = new RepayPlanStrategyKey();
-        key.setRepayMethod(RepayMethod.INTEREST_FIRST);
-        return key;
-    }
+@Service
+public class RepayPlanServiceImpl implements RepayPlanService {
 
     @Override
-    public List<RepayPlanItem> generate(RepayPlanRequest request) {
-        validate(request);
-        int periodCount = request.getPeriodCount();
-        int periodDays = request.getPeriodDays();
-        long principal = request.getPrincipal();
-        long dailyRate = request.getDailyRate();
+    public List<RepayPlanItem> generateEqualPrincipalPlan(long principal,
+                                                          long dailyRate,
+                                                          LocalDate loanDate,
+                                                          int periodDays,
+                                                          int periodCount) {
+        if (principal <= 0 || dailyRate <= 0 || loanDate == null || periodDays <= 0 || periodCount <= 0) {
+            throw new IllegalArgumentException("参数不合法");
+        }
 
         List<RepayPlanItem> items = new ArrayList<>(periodCount);
+        long perPrincipal = principal / periodCount;
         long remainingPrincipal = principal;
-        LocalDate startDate = request.getLoanDate();
+        LocalDate startDate = loanDate;
 
         for (int period = 1; period <= periodCount; period++) {
+            long currentPrincipal = period == periodCount ? remainingPrincipal : perPrincipal;
             long interest = ScfInterestUtils.calculateInterest(remainingPrincipal, dailyRate, (long) periodDays);
-            long currentPrincipal = period == periodCount ? remainingPrincipal : 0L;
             remainingPrincipal -= currentPrincipal;
             LocalDate dueDate = startDate.plusDays(periodDays);
 

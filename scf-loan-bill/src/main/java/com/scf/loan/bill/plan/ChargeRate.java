@@ -1,6 +1,6 @@
 package com.scf.loan.bill.plan;
 
-import com.scf.loan.bill.plan.enums.ChargeSubject;
+import com.scf.loan.common.enums.ChargeSubject;
 import com.scf.loan.bill.plan.enums.RateUnit;
 
 import javax.validation.constraints.NotNull;

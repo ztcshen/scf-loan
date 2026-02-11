@@ -19,13 +19,9 @@ public class RepayPlanStrategyRouterTest {
     @Test
     public void testRouteFallbackToRepayMethodOnly() {
         RepayPlanStrategyRouter router = new RepayPlanStrategyRouter(Collections.singletonList(
-                new StubStrategy(RepayPlanStrategyKey.builder().repayMethod(RepayMethod.EQUAL_PRINCIPAL).build())
+                new StubStrategy(buildKey(RepayMethod.EQUAL_PRINCIPAL, null, null))
         ));
-        RepayPlanStrategyKey key = RepayPlanStrategyKey.builder()
-                .repayMethod(RepayMethod.EQUAL_PRINCIPAL)
-                .interestType(InterestType.DAILY.getCode())
-                .periodUnit(PeriodUnit.DAY.getCode())
-                .build();
+        RepayPlanStrategyKey key = buildKey(RepayMethod.EQUAL_PRINCIPAL, InterestType.DAILY.getCode(), PeriodUnit.DAY.getCode());
         RepayPlanStrategy strategy = router.route(key);
         assertEquals(RepayMethod.EQUAL_PRINCIPAL, strategy.key().getRepayMethod());
     }
@@ -33,22 +29,28 @@ public class RepayPlanStrategyRouterTest {
     @Test
     public void testRouteThrowsWhenStrategyMissing() {
         RepayPlanStrategyRouter router = new RepayPlanStrategyRouter(Collections.singletonList(
-                new StubStrategy(RepayPlanStrategyKey.builder().repayMethod(RepayMethod.EQUAL_PRINCIPAL).build())
+                new StubStrategy(buildKey(RepayMethod.EQUAL_PRINCIPAL, null, null))
         ));
-        RepayPlanStrategyKey key = RepayPlanStrategyKey.builder()
-                .repayMethod(RepayMethod.EQUAL_PRINCIPAL_INTEREST)
-                .build();
+        RepayPlanStrategyKey key = buildKey(RepayMethod.EQUAL_PRINCIPAL_INTEREST, null, null);
         assertThrows(IllegalArgumentException.class, () -> router.route(key));
     }
 
     @Test
     public void testDuplicateStrategyKeyThrows() {
-        RepayPlanStrategyKey key = RepayPlanStrategyKey.builder().repayMethod(RepayMethod.EQUAL_PRINCIPAL).build();
+        RepayPlanStrategyKey key = buildKey(RepayMethod.EQUAL_PRINCIPAL, null, null);
         List<RepayPlanStrategy> strategies = Arrays.asList(
                 new StubStrategy(key),
                 new StubStrategy(key)
         );
         assertThrows(IllegalStateException.class, () -> new RepayPlanStrategyRouter(strategies));
+    }
+
+    private RepayPlanStrategyKey buildKey(RepayMethod repayMethod, String interestType, String periodUnit) {
+        RepayPlanStrategyKey key = new RepayPlanStrategyKey();
+        key.setRepayMethod(repayMethod);
+        key.setInterestType(interestType);
+        key.setPeriodUnit(periodUnit);
+        return key;
     }
 
     private static class StubStrategy implements RepayPlanStrategy {

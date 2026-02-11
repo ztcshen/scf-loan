@@ -72,4 +72,116 @@ public class RepayPlanRequest {
      */
     private String settlementMode;
     private List<ChargeRate> chargeRates;
+
+    public RepayMethod getRepayMethod() {
+        return repayMethod;
+    }
+
+    public void setRepayMethod(RepayMethod repayMethod) {
+        this.repayMethod = repayMethod;
+    }
+
+    public Long getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(Long principal) {
+        this.principal = principal;
+    }
+
+    public Long getDailyRate() {
+        return dailyRate;
+    }
+
+    public void setDailyRate(Long dailyRate) {
+        this.dailyRate = dailyRate;
+    }
+
+    public Long getPenaltyDailyRate() {
+        return penaltyDailyRate;
+    }
+
+    public void setPenaltyDailyRate(Long penaltyDailyRate) {
+        this.penaltyDailyRate = penaltyDailyRate;
+    }
+
+    public LocalDate getLoanDate() {
+        return loanDate;
+    }
+
+    public void setLoanDate(LocalDate loanDate) {
+        this.loanDate = loanDate;
+    }
+
+    public Integer getPeriodDays() {
+        return periodDays;
+    }
+
+    public void setPeriodDays(Integer periodDays) {
+        this.periodDays = periodDays;
+    }
+
+    public Integer getPeriodCount() {
+        return periodCount;
+    }
+
+    public void setPeriodCount(Integer periodCount) {
+        this.periodCount = periodCount;
+    }
+
+    public String getInterestType() {
+        return interestType;
+    }
+
+    public void setInterestType(String interestType) {
+        this.interestType = interestType;
+    }
+
+    public String getPeriodUnit() {
+        return periodUnit;
+    }
+
+    public void setPeriodUnit(String periodUnit) {
+        this.periodUnit = periodUnit;
+    }
+
+    public String getDayCountConvention() {
+        return dayCountConvention;
+    }
+
+    public void setDayCountConvention(String dayCountConvention) {
+        this.dayCountConvention = dayCountConvention;
+    }
+
+    public String getRateType() {
+        return rateType;
+    }
+
+    public void setRateType(String rateType) {
+        this.rateType = rateType;
+    }
+
+    public String getGraceType() {
+        return graceType;
+    }
+
+    public void setGraceType(String graceType) {
+        this.graceType = graceType;
+    }
+
+    public String getSettlementMode() {
+        return settlementMode;
+    }
+
+    public void setSettlementMode(String settlementMode) {
+        this.settlementMode = settlementMode;
+    }
+
+    public List<ChargeRate> getChargeRates() {
+        return chargeRates;
+    }
+
+    public void setChargeRates(List<ChargeRate> chargeRates) {
+        this.chargeRates = chargeRates;
+    }
 }
