@@ -16,7 +16,12 @@ public class RepayTrialRequest {
      */
     private LocalDate trialDate;
     /**
-     * 历史还款日期列表，用于计算利息/罚息天数
+     * 历史还款日期列表，用于计算利息/罚息天数。
+     * <p>
+     * <b>注意：</b> 此逻辑假设最近一次还款日之前的利息/罚息已完全结清。
+     * 如果存在“部分还款但未结清利息”的情况，单纯依赖此日期截断会导致历史未还利息丢失。
+     * 调用方需确保传入的 {@code periodDetails} 或外部逻辑已包含历史欠费，或者仅在利息结清时才更新此列表。
+     * </p>
      */
     private List<LocalDate> repayDates;
     /**
