@@ -16,6 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>com.scf</groupId>
+            <artifactId>scf-loan-bill-sdk</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.scf</groupId>
             <artifactId>scf-loan-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

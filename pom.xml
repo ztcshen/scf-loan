@@ -124,6 +124,7 @@
         <module>scf-loan-common</module>
         <module>scf-loan-dal</module>
         <module>scf-loan-biz</module>
+        <module>scf-loan-bill-sdk</module>
         <module>scf-loan-bill</module>
         <module>scf-loan-service</module>
         <module>scf-loan-web</module>
