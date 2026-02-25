@@ -27,6 +27,9 @@ public class RepayPlanRequest {
     @NotNull
     @Positive
     private Long dailyRate;
+    /**
+     * 罚息日利率，单位：亿分比。
+     */
     @NotNull
     @Positive
     private Long penaltyDailyRate;
@@ -71,6 +74,11 @@ public class RepayPlanRequest {
      * 结算方式扩展字段，用于更细粒度策略路由。
      */
     private String settlementMode;
+    /**
+     * 费用/利率配置列表。
+     * <p>
+     * 用于支持多科目的灵活费率配置（如利息、罚息、手续费等），包含科目类型、费率单位及数值。
+     */
     private List<ChargeRate> chargeRates;
 
     public RepayMethod getRepayMethod() {

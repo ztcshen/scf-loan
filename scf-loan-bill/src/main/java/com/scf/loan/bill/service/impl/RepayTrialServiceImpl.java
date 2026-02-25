@@ -34,10 +34,10 @@ public class RepayTrialServiceImpl implements RepayTrialService {
 
     @Override
     public RepayTrialResult trial(RepayTrialRequest request) {
-        if (request == null || request.getPlanRequest() == null || request.getTrialDate() == null) {
+        if (request == null || request.getTrialDate() == null) {
             throw new IllegalArgumentException("参数不合法");
         }
-        RepayPlanRequest planRequest = request.getPlanRequest();
+        RepayPlanRequest planRequest = request;
         LocalDate trialDate = request.getTrialDate();
         List<RepayTrialScheduleItem> periodDetails = buildScheduleItems(request);
         if (periodDetails == null || periodDetails.isEmpty()) {
@@ -110,7 +110,7 @@ public class RepayTrialServiceImpl implements RepayTrialService {
         if (periodDetails != null && !periodDetails.isEmpty()) {
             return periodDetails;
         }
-        List<RepayPlanItem> items = repayPlanService.generatePlan(request.getPlanRequest());
+        List<RepayPlanItem> items = repayPlanService.generatePlan(request);
         if (items == null || items.isEmpty()) {
             return items == null ? null : new ArrayList<>();
         }

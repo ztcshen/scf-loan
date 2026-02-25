@@ -6,11 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class RepayTrialRequest {
-    /**
-     * 还款计划生成参数
-     */
-    private RepayPlanRequest planRequest;
+public class RepayTrialRequest extends RepayPlanRequest {
     /**
      * 试算日期
      */
@@ -28,14 +24,6 @@ public class RepayTrialRequest {
      * 各期科目已还/应还数据
      */
     private List<RepayTrialScheduleItem> periodDetails;
-
-    public RepayPlanRequest getPlanRequest() {
-        return planRequest;
-    }
-
-    public void setPlanRequest(RepayPlanRequest planRequest) {
-        this.planRequest = planRequest;
-    }
 
     public LocalDate getTrialDate() {
         return trialDate;
