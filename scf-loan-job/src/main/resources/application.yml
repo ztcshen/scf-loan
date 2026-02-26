@@ -1,0 +1,71 @@
+# 应用配置
+spring:
+  application:
+    name: scf-loan-job
+
+# XXL-JOB配置
+xxl:
+  job:
+    admin:
+      # 调度中心部署地址，多个地址用逗号分隔
+      addresses: http://localhost:8080/xxl-job-admin
+    # 执行器通讯TOKEN，非空时启用
+    accessToken: ""
+    executor:
+      # 执行器AppName，与调度中心配置的执行器名称一致
+      appname: scf-loan-job
+      # 执行器注册地址，为空时使用内嵌服务IP:PORT
+      address: ""
+      # 执行器IP，为空时自动获取
+      ip: ""
+      # 执行器端口，小于0时自动获取
+      port: 9999
+      # 执行器运行日志文件存储磁盘路径
+      logpath: /data/applogs/xxl-job/jobhandler
+      # 执行器日志文件保存天数
+      logretentiondays: 30
+
+# 日志配置
+logging:
+  level:
+    com.scf.loan: INFO
+    com.xxl.job: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+
+# 服务端口号
+server:
+  port: 8081
+
+# 监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      module: job-scheduler
+
+# 自定义指标配置
+xxl:
+  job:
+    metrics:
+      enabled: true
+      # 是否记录详细的业务指标
+      detailed-metrics: true
+      # 慢任务阈值（毫秒）
+      slow-job-threshold: 5000
