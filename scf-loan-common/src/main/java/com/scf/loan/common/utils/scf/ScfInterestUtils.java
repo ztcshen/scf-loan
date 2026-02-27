@@ -39,7 +39,7 @@ public class ScfInterestUtils {
 
         LocalDate latestRepayDate = previousRepayDates.get(0);
         long daysBetween = ChronoUnit.DAYS.between(latestRepayDate, queryDate);
-        return (int) daysBetween;
+        return (int) Math.max(daysBetween, 1);
     }
 
     public static int calculatePenaltyDays(LocalDate dueDate, LocalDate queryDate) {

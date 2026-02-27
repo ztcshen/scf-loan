@@ -18,4 +18,4 @@ This project uses **Agent Skills** to enhance development efficiency:
 - **`skills/anthropics`**: General-purpose capabilities (`doc-coauthoring`).
 
 ## Documentation
-- [Technical Design](docs/design/financing-order-service-design.md)
+- [Technical Design](docs/design/order/financing-order-service-design.md)

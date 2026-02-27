@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://mysql-dev:3306/scf_loan?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: scf_loan
+    password: ${SCF_LOAN_DB_PASSWORD:change-me}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: redis-dev
+    port: 6379
+    database: 0
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.scf.loan.dal.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+dubbo:
+  registry:
+    address: zookeeper://zookeeper-dev:2181
