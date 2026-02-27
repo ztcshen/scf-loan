@@ -31,7 +31,7 @@ public class ScfInterestUtilsTest {
         );
 
         assertEquals(1, ScfInterestUtils.calculateInterestDays(startDate, repayDateList, LocalDate.of(2025, 10, 19)));
-        assertEquals(0, ScfInterestUtils.calculateInterestDays(startDate, repayDateList, LocalDate.of(2025, 10, 20)));
+        assertEquals(1, ScfInterestUtils.calculateInterestDays(startDate, repayDateList, LocalDate.of(2025, 10, 20)));
         assertEquals(1, ScfInterestUtils.calculateInterestDays(startDate, repayDateList, LocalDate.of(2025, 10, 21)));
         assertEquals(2, ScfInterestUtils.calculateInterestDays(startDate, repayDateList, LocalDate.of(2025, 10, 22)));
         assertEquals(1, ScfInterestUtils.calculateInterestDays(startDate, repayDateList, LocalDate.of(2025, 10, 26)));

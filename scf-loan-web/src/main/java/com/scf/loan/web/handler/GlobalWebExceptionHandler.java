@@ -24,7 +24,7 @@ public class GlobalWebExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalWebExceptionHandler.class);
 
     @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseDTO<?> handleServiceException(ServiceException e) {
         log.warn("业务异常: {}-{}", e.getMessage(), e.getBusinessMessage(), e);
@@ -35,7 +35,7 @@ public class GlobalWebExceptionHandler {
      * 处理参数校验异常
      */
     @ExceptionHandler(ValidateException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseDTO<?> handleValidateException(ValidateException e) {
         log.warn("参数校验异常: {}", e.getMessage(), e);
@@ -43,7 +43,7 @@ public class GlobalWebExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseDTO<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getFieldErrors().stream()
@@ -55,7 +55,7 @@ public class GlobalWebExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseDTO<?> handleConstraintViolationException(ConstraintViolationException e) {
         String message = e.getConstraintViolations().stream()
@@ -71,7 +71,7 @@ public class GlobalWebExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseDTO<?> handleException(Exception e) {
         log.error("系统异常: {}", e.getMessage(), e);
         return ResponseDTO.fail(ResultCodeEnum.SYSTEM_ERROR);

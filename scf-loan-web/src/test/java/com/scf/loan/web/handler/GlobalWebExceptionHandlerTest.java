@@ -37,7 +37,7 @@ public class GlobalWebExceptionHandlerTest {
     public void testHandleServiceException() throws Exception {
         mockMvc.perform(get("/test/service-exception")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("600"))
                 .andExpect(jsonPath("$.message").value("Business Error Occurred"));
     }
@@ -46,7 +46,7 @@ public class GlobalWebExceptionHandlerTest {
     public void testHandleValidateException() throws Exception {
         mockMvc.perform(get("/test/validate-exception")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.message").value("参数错误:Invalid Parameter"));
     }
@@ -55,7 +55,7 @@ public class GlobalWebExceptionHandlerTest {
     public void testHandleException() throws Exception {
         mockMvc.perform(get("/test/exception")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value("500"))
                 .andExpect(jsonPath("$.message").value("系统异常"));
     }
