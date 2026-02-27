@@ -10,6 +10,8 @@ import com.scf.loan.bill.service.RepayService;
 import com.scf.loan.bill.service.RepayTrialService;
 import com.scf.loan.common.dto.RepayPlanItem;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,17 +30,17 @@ public class RepayController {
     private RepayService repayService;
 
     @PostMapping("/plan")
-    public List<RepayPlanItem> generatePlan(@RequestBody RepayPlanRequest request) {
+    public List<RepayPlanItem> generatePlan(@Valid @RequestBody RepayPlanRequest request) {
         return repayPlanService.generatePlan(request);
     }
 
     @PostMapping("/trial")
-    public RepayTrialResult trial(@RequestBody RepayTrialRequest request) {
+    public RepayTrialResult trial(@Valid @RequestBody RepayTrialRequest request) {
         return repayTrialService.trial(request);
     }
 
     @PostMapping("/repay")
-    public RepayResult repay(@RequestBody RepayRequest request) {
+    public RepayResult repay(@Valid @RequestBody RepayRequest request) {
         return repayService.repay(request);
     }
 }
