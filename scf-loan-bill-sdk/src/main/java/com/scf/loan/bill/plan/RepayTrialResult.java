@@ -10,6 +10,14 @@ public class RepayTrialResult {
     private Integer period;
     private LocalDate startDate;
     private LocalDate dueDate;
+    /**
+     * 逾期天数
+     */
+    private Integer overdueDays;
+    /**
+     * 计息天数
+     */
+    private Integer interestDays;
     private List<RepayTrialSubjectDetail> amountDetail;
 
     public Integer getPeriod() {
@@ -34,6 +42,22 @@ public class RepayTrialResult {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Integer getOverdueDays() {
+        return overdueDays;
+    }
+
+    public void setOverdueDays(Integer overdueDays) {
+        this.overdueDays = overdueDays;
+    }
+
+    public Integer getInterestDays() {
+        return interestDays;
+    }
+
+    public void setInterestDays(Integer interestDays) {
+        this.interestDays = interestDays;
     }
 
     public List<RepayTrialSubjectDetail> getAmountDetail() {

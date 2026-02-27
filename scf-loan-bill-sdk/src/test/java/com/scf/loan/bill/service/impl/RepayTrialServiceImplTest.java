@@ -46,6 +46,26 @@ public class RepayTrialServiceImplTest {
         assertEquals(1, result.getPeriod());
         assertNotNull(result.getAmountDetail());
         assertEquals(4, result.getAmountDetail().size());
+        assertEquals(0, result.getOverdueDays());
+    }
+
+    @Test
+    public void testTrialOverdueDays() {
+        RepayTrialService service = buildService();
+        RepayTrialRequest request = buildRequest(RepayMethod.EQUAL_PRINCIPAL);
+        request.setPeriodCount(1);
+        
+        // Due Date: 2026-02-02 (Loan 2026-02-01 + 1 day)
+        // Trial Date: 2026-02-05
+        // Overdue: 3 days
+        request.setTrialDate(LocalDate.of(2026, 2, 5));
+
+        RepayTrialResult result = service.trial(request);
+
+        assertNotNull(result);
+        assertEquals(3, result.getOverdueDays());
+        // Interest Days: 2026-02-01 to 2026-02-02 = 1 day
+        assertEquals(1, result.getInterestDays());
     }
 
     @Test
@@ -114,6 +134,7 @@ public class RepayTrialServiceImplTest {
 
         assertEquals(loanDate, result.getStartDate());
         assertEquals(loanDate.plusDays(1), result.getDueDate());
+        assertEquals(1, result.getInterestDays());
     }
 
     @Test

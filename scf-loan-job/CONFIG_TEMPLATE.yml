@@ -1,0 +1,510 @@
+# SCF Loan Job 框架配置模板
+
+## 1. 基础配置
+
+```yaml
+# application.yml
+scf:
+  job:
+    framework:
+      # 框架开关
+      enabled: true
+      
+      # 基础配置
+      base:
+        app-name: ${spring.application.name}
+        environment: ${spring.profiles.active:default}
+        version: 1.0.0
+        
+      # 调度配置
+      dispatch:
+        enabled: true
+        timeout: 30000
+        retry-enabled: true
+        max-retry-times: 3
+        
+      # 线程池配置
+      thread-pool:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 1000
+        keep-alive-seconds: 60
+        thread-name-prefix: "scf-job-"
+```
+
+## 2. 路由配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 路由配置
+      route:
+        enabled: true
+        cache-enabled: true
+        cache-size: 1000
+        cache-ttl: 3600
+        
+        # 默认策略
+        default-strategy: businessType
+        
+        # 策略列表
+        strategies:
+          # 业务类型路由
+          - name: businessType
+            type: com.mandao.scf.job.framework.strategy.BusinessTypeRouteStrategy
+            priority: 1
+            enabled: true
+            config:
+              business-types:
+                - name: loan
+                  route-key: loan_route
+                - name: repay
+                  route-key: repay_route
+                  
+          # 资方类型路由
+          - name: creditContractType
+            type: com.mandao.scf.job.framework.strategy.CreditContractTypeRouteStrategy
+            priority: 2
+            enabled: true
+            config:
+              contract-types:
+                - name: BANK_A
+                  route-key: bank_a_route
+                - name: BANK_B
+                  route-key: bank_b_route
+                  
+          # 区域路由
+          - name: region
+            type: com.mandao.scf.job.framework.strategy.RegionRouteStrategy
+            priority: 3
+            enabled: true
+            config:
+              regions:
+                - name: east
+                  route-key: east_route
+                - name: west
+                  route-key: west_route
+```
+
+## 3. 执行策略配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 执行策略配置
+      execute:
+        enabled: true
+        
+        # 默认策略
+        default-strategy: sync
+        
+        # 策略列表
+        strategies:
+          # 同步执行
+          - name: sync
+            type: com.mandao.scf.job.framework.strategy.SyncExecuteStrategy
+            priority: 1
+            enabled: true
+            config:
+              timeout: 30000
+              
+          # 异步执行
+          - name: async
+            type: com.mandao.scf.job.framework.strategy.AsyncExecuteStrategy
+            priority: 2
+            enabled: true
+            config:
+              thread-pool-size: 20
+              timeout: 60000
+              
+          # 重试执行
+          - name: retry
+            type: com.mandao.scf.job.framework.strategy.RetryExecuteStrategy
+            priority: 3
+            enabled: true
+            config:
+              max-retry-times: 3
+              retry-interval: 1000
+              backoff-strategy: exponential
+              
+          # 限流执行
+          - name: rate-limit
+            type: com.mandao.scf.job.framework.strategy.RateLimitExecuteStrategy
+            priority: 4
+            enabled: false
+            config:
+              permits-per-second: 100
+              timeout: 5000
+              
+          # 熔断执行
+          - name: circuit-breaker
+            type: com.mandao.scf.job.framework.strategy.CircuitBreakerExecuteStrategy
+            priority: 5
+            enabled: false
+            config:
+              failure-rate-threshold: 50
+              wait-duration-in-open-state: 60000
+              sliding-window-size: 100
+```
+
+## 4. 命令配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 命令配置
+      command:
+        enabled: true
+        
+        # 命令注册配置
+        registry:
+          auto-scan-enabled: true
+          scan-packages:
+            - com.mandao.scf.job.command
+            - com.mandao.scf.job.business.command
+            
+        # 默认命令配置
+        defaults:
+          timeout: 30000
+          retry-enabled: true
+          max-retry-times: 3
+          async-supported: false
+          
+        # 具体命令配置
+        commands:
+          # SCF核心命令
+          - name: PROCESS_CORE_STATUS
+            description: 处理核心订单状态
+            timeout: 30000
+            retry-enabled: true
+            max-retry-times: 3
+            async-supported: true
+            
+          - name: SYNC_REPAY_SCHEDULE
+            description: 同步融资还款计划
+            timeout: 60000
+            retry-enabled: true
+            max-retry-times: 2
+            async-supported: true
+            
+          - name: GENERATE_REPAY_DAILY_SNAPSHOT
+            description: 生成每笔订单的按日快照
+            timeout: 120000
+            retry-enabled: false
+            async-supported: true
+            
+          - name: GENERATE_DAILY_SUMMARY
+            description: 生成每日汇总数据
+            timeout: 300000
+            retry-enabled: false
+            async-supported: true
+            
+          - name: INIT_CONTRACT_TABLE
+            description: 初始化合同表基本属性
+            timeout: 30000
+            retry-enabled: true
+            max-retry-times: 1
+            async-supported: false
+```
+
+## 5. 监控配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 监控配置
+      monitor:
+        enabled: true
+        
+        # 指标配置
+        metrics:
+          enabled: true
+          prefix: scf_job
+          export-interval: 60
+          
+        # 日志配置
+        log:
+          enabled: true
+          level: INFO
+          pattern: "[%X{traceLogId}] %msg%n"
+          
+        # 链路追踪
+        tracing:
+          enabled: true
+          header-name: traceLogId
+          
+        # 告警配置
+        alert:
+          enabled: true
+          rules:
+            - name: high-error-rate
+              metric: error_rate
+              threshold: 0.05
+              duration: 300
+              severity: warning
+              
+            - name: high-latency
+              metric: avg_latency
+              threshold: 5000
+              duration: 300
+              severity: warning
+              
+            - name: task-failure
+              metric: failure_count
+              threshold: 10
+              duration: 60
+              severity: critical
+```
+
+## 6. Handler配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # Handler配置
+      handler:
+        enabled: true
+        
+        # SCF核心Handler
+        scf-core:
+          enabled: true
+          name: scfCoreHandler
+          description: SCF核心命令处理Handler
+          
+        # 业务Handler
+        business:
+          enabled: true
+          name: businessHandler
+          description: 业务处理Handler
+          
+        # 自定义Handler
+        custom:
+          enabled: true
+          name: customHandler
+          description: 自定义业务Handler
+          
+        # 系统Handler
+        system:
+          enabled: true
+          name: systemHandler
+          description: 系统级任务Handler
+```
+
+## 7. 缓存配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 缓存配置
+      cache:
+        enabled: true
+        
+        # 路由缓存
+        route:
+          enabled: true
+          max-size: 1000
+          ttl: 3600
+          
+        # 命令缓存
+        command:
+          enabled: true
+          max-size: 500
+          ttl: 1800
+          
+        # 结果缓存
+        result:
+          enabled: false
+          max-size: 100
+          ttl: 300
+```
+
+## 8. 安全配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 安全配置
+      security:
+        enabled: true
+        
+        # 参数校验
+        validation:
+          enabled: true
+          fail-fast: true
+          
+        # 权限控制
+        authorization:
+          enabled: false
+          
+        # 数据加密
+        encryption:
+          enabled: false
+          algorithm: AES
+          
+        # 审计日志
+        audit:
+          enabled: true
+          log-level: INFO
+```
+
+## 9. 扩展配置
+
+```yaml
+scf:
+  job:
+    framework:
+      # 扩展配置
+      extension:
+        enabled: true
+        
+        # 插件配置
+        plugins:
+          - name: custom-route-plugin
+            type: com.mandao.scf.job.plugin.CustomRoutePlugin
+            enabled: false
+            config:
+              custom-param: value
+              
+          - name: custom-execute-plugin
+            type: com.mandao.scf.job.plugin.CustomExecutePlugin
+            enabled: false
+            
+        # 自定义策略
+        custom-strategies:
+          route:
+            - name: myCustomRoute
+              class: com.mandao.scf.job.strategy.MyCustomRouteStrategy
+              priority: 10
+              
+          execute:
+            - name: myCustomExecute
+              class: com.mandao.scf.job.strategy.MyCustomExecuteStrategy
+              priority: 10
+```
+
+## 10. 环境特定配置
+
+### 10.1 开发环境配置
+
+```yaml
+# application-dev.yml
+scf:
+  job:
+    framework:
+      base:
+        environment: dev
+        
+      monitor:
+        log:
+          level: DEBUG
+          
+      dispatch:
+        timeout: 60000
+```
+
+### 10.2 测试环境配置
+
+```yaml
+# application-test.yml
+scf:
+  job:
+    framework:
+      base:
+        environment: test
+        
+      monitor:
+        log:
+          level: INFO
+          
+      thread-pool:
+        core-pool-size: 5
+        max-pool-size: 20
+```
+
+### 10.3 生产环境配置
+
+```yaml
+# application-prod.yml
+scf:
+  job:
+    framework:
+      base:
+        environment: prod
+        
+      monitor:
+        log:
+          level: WARN
+          
+      thread-pool:
+        core-pool-size: 20
+        max-pool-size: 100
+        
+      security:
+        enabled: true
+        authorization:
+          enabled: true
+```
+
+## 11. 配置验证
+
+```yaml
+# 配置验证
+scf:
+  job:
+    framework:
+      # 配置验证
+      validation:
+        enabled: true
+        
+        # 启动时验证
+        on-startup: true
+        
+        # 运行时验证
+        on-runtime: true
+        
+        # 验证规则
+        rules:
+          - type: required
+            fields: [scf.job.framework.enabled]
+            
+          - type: range
+            field: scf.job.framework.thread-pool.core-pool-size
+            min: 1
+            max: 100
+            
+          - type: regex
+            field: scf.job.framework.base.environment
+            pattern: "^(dev|test|staging|prod)$"
+```
+
+## 12. 配置热更新
+
+```yaml
+# 配置热更新
+scf:
+  job:
+    framework:
+      # 热更新配置
+      hot-reload:
+        enabled: true
+        
+        # 更新间隔
+        interval: 60
+        
+        # 更新策略
+        strategy: incremental
+        
+        # 回滚配置
+        rollback:
+          enabled: true
+          max-versions: 10
+```
+
+这个配置模板提供了完整的框架配置选项，支持不同环境的灵活配置和运行时调整。

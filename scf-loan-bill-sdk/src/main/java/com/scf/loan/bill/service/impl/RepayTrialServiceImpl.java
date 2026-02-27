@@ -18,6 +18,7 @@ import com.scf.loan.common.utils.scf.ScfInterestUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,6 +64,12 @@ public class RepayTrialServiceImpl implements RepayTrialService {
         subjectAmounts.put(ChargeSubject.INTEREST, unpaidInterest);
 
         int penaltyDays = calculatePenaltyDays(current.getDueDate(), request.getRepayDates(), trialDate);
+        // 计算物理逾期天数
+        int overdueDays = Math.max(0, (int) ChronoUnit.DAYS.between(current.getDueDate(), trialDate));
+        // 计算本期计息天数：max(1, min(trialDate, dueDate) - startDate)
+        LocalDate interestEndDate = trialDate.isAfter(current.getDueDate()) ? current.getDueDate() : trialDate;
+        int interestDays = Math.max(1, (int) ChronoUnit.DAYS.between(current.getStartDate(), interestEndDate));
+        
         long penalty = calculatePenaltyAmount(outstandingPrincipal, planRequest.getPenaltyDailyRate(), penaltyDays);
         long unpaidPenalty = Math.max(0L, penalty - repaidPenalty);
         subjectAmounts.put(ChargeSubject.PENALTY, unpaidPenalty);
@@ -99,6 +106,8 @@ public class RepayTrialServiceImpl implements RepayTrialService {
         result.setPeriod(current.getPeriod());
         result.setStartDate(current.getStartDate());
         result.setDueDate(current.getDueDate());
+        result.setOverdueDays(overdueDays);
+        result.setInterestDays(interestDays);
         result.setAmountDetail(amountDetail);
         return result;
     }
