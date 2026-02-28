@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: scf-loan-risk
+server:
+  port: 8091

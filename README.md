@@ -10,6 +10,7 @@ SCF (Supply Chain Finance) Loan is a core financing service responsible for mana
 - **scf-loan-dal**: Data access layer (MyBatis Plus).
 - **scf-loan-common**: Shared DTOs, Enums, and Utils.
 - **scf-loan-job**: Scheduled tasks.
+- **scf-loan-risk**: 风控项目（规则引擎 + 风险评估 API）。
 
 ## Development Workflow
 This project uses **Agent Skills** to enhance development efficiency:
